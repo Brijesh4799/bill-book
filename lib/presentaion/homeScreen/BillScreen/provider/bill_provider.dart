@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import '../repo/bill_repository.dart';
 
 class BillProvider with ChangeNotifier{
@@ -78,6 +77,15 @@ class BillProvider with ChangeNotifier{
   TextEditingController surchargeController = TextEditingController();
   TextEditingController paymentRemarkController = TextEditingController();
   TextEditingController discountController = TextEditingController();
+  TextEditingController weightUnitController = TextEditingController();
+  TextEditingController gstController = TextEditingController();
+  TextEditingController gstPercentageController = TextEditingController();
+  TextEditingController gstTypeController = TextEditingController();
+  TextEditingController reverseChargeController = TextEditingController();
+  TextEditingController gstPaidByController = TextEditingController();
+  TextEditingController insuranceTypeController = TextEditingController();
+  TextEditingController insuranceChargePercentController = TextEditingController();
+  TextEditingController gstValueController = TextEditingController();
 
   //Insurens Details
 
@@ -86,6 +94,9 @@ class BillProvider with ChangeNotifier{
   //Vahical Insurens Details
 
   TextEditingController declarationVehicleValueController = TextEditingController();
+  TextEditingController vehicleInsuranceTypeController = TextEditingController();
+  TextEditingController vehicleInsuranceChargePercentController = TextEditingController();
+  TextEditingController vehicleGstValueController = TextEditingController();
 
   Future<void> billprovider({required String mobileNumber, required BuildContext context}) async {
     final billRepository = BillRepository();
@@ -138,6 +149,7 @@ class BillProvider with ChangeNotifier{
           "packageDetails": {
             "packageType": packageController.text.trim(),
             "packagedescription": descriptionController.text.trim(),
+            "packagetotalWeight": weightUnitController.text.trim(),
             "packagetotalWeight": totalWeightController.text.trim(),
             "packageHSN": receiveConditionController.text.trim(),
             "packageRemark": remarkController.text.trim(),
@@ -158,24 +170,27 @@ class BillProvider with ChangeNotifier{
             "packingSTCharge": stChargeController.text.trim(),
             "packingGreenTax": octrioTaxController.text.trim(),
             "packingSurcharge": surchargeController.text.trim(),
-            "packingGstShow": "hide", // or from a controller if dynamic
-            "packingGstNo": "789",     // or from a controller if needed
-            "packingGstType": "main",  // or from a controller
-            "packingReverseCharge": "89",
-            "packingGstPaidBy": "anidjd",
+             // or from a controller if dynamic
+            "packingGstShow": gstController.text.trim(),     // or from a controller if needed
+            "packingGstNo": gstPercentageController,     // or from a controller if needed
+            "packingGstType": gstTypeController.text.trim(),  // or from a controller
+            "packingReverseCharge": reverseChargeController.text.trim(),
+            "packingGstPaidBy": gstPaidByController.text.trim(),
             "packingPaymentRemark": paymentRemarkController.text.trim(),
             "packingDiscountAmount": discountController.text.trim(),
             "totalAmount": "720" // add dynamic calculation if needed
           },
           "insuranceDetails": {
-            "insuranceType": "Full Cover", // or dynamic
-            "insuranceCharges": "200",     // or from controller
-            "declarationValueOfGoods": "5000"
+            "insuranceType": insuranceTypeController.text.trim(), // or dynamic
+            "insuranceCharges": insuranceChargePercentController.text.trim(),     // or from controller
+            "insuranceCharges1": gstValueController.text.trim(),     // or from controller
+            "declarationValueOfGoods": declarationGoodsValueController.text.trim(),
           },
           "vehicleInsuranceDetails": {
-            "vehicleNumber": "VHC123",
-            "insuranceType": "Comprehensive",
-            "insuranceCharges": "300"
+            "vehicleNumber": vehicleInsuranceTypeController.text.trim(),
+            "insuranceType": vehicleInsuranceChargePercentController.text.trim(),
+            "insuranceType": vehicleGstValueController.text.trim(),
+            "insuranceCharges": declarationVehicleValueController.text.trim(),
           }
         }
       };

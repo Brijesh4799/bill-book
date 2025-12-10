@@ -1,219 +1,19 @@
-/*
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-
-import '../../../../core/widgets/custom_Textbutton.dart';
-import '../../../../core/widgets/custom_app_bar/ui/customAppBar.dart';
-import '../../../../core/widgets/custom_input_text_field.dart';
-import '../model/car_condition_report_model.dart';
-import '../repo/car_condition_report_repogistory.dart';
-
-class CarConditionRepotsDownload extends StatefulWidget {
-  const CarConditionRepotsDownload({super.key});
-
-  @override
-  State<CarConditionRepotsDownload> createState() => _CarConditionRepotsDownloadState();
-}
-
-class _CarConditionRepotsDownloadState extends State<CarConditionRepotsDownload> {
-  final TextEditingController startDateController = TextEditingController();
-  final TextEditingController endDateController = TextEditingController();
-
-  final CarConditionReportRepogistory _repo = CarConditionReportRepogistory();
-
-  List<Data> reportData = [];
-
-  Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2100),
-    );
-    if (picked != null) {
-      controller.text = DateFormat('yyyy-MM-dd').format(picked);
-    }
-  }
-
-  void _downloadReport() async {
-    String startDate = startDateController.text.trim();
-    String endDate = endDateController.text.trim();
-
-    if (startDate.isEmpty || endDate.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select both start and end date')),
-      );
-      return;
-    }
-
-    try {
-      final report = await _repo.getcardataApi(startDate, endDate);
-      setState(() {
-        reportData = report.data ?? [];
-      });
-    } catch (e) {
-      print('Error downloading report: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to download report')),
-      );
-    }
-  }
-
-  Widget _buildReportCard(Data item) {
-    final condition = item.formData?.vehicleConditionDetails;
-    final details = item.formData?.vehicleDetails;
-    final accessories = item.formData?.accessoriesDetails;
-    final scratches = item.formData?.dentScratchesDetails;
-
-    return
-
-      */
-/*Card(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      elevation: 3,
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Condition No: ${condition?.vehicleConditionNumber ?? "N/A"}', style: TextStyle(fontWeight: FontWeight.bold)),
-            Text('LR No: ${condition?.vehicleLRNumber ?? "N/A"}'),
-            Text('Party Name: ${condition?.vehiclePartyName ?? "N/A"}'),
-            Text('Phone: ${condition?.vehiclePartyPhone ?? "N/A"}'),
-            Text('Email: ${condition?.vehiclePartyEmail ?? "N/A"}'),
-            Text('Date: ${condition?.vehiclePartydate ?? "N/A"}'),
-            Text('Move From: ${condition?.vehiclePartyMoveFrom ?? "N/A"}'),
-            Text('Move To: ${condition?.vehiclePartyMoveTo ?? "N/A"}'),
-            const Divider(),
-            Text('Vehicle Type: ${details?.vehicleType ?? "N/A"}'),
-            Text('Brand: ${details?.vehicleBrandName ?? "N/A"}'),
-            Text('Value: ${details?.vehicleValue ?? "N/A"}'),
-            Text('Registration No: ${details?.vehicleRegistrationNumber ?? "N/A"}'),
-            Text('Chassis No: ${details?.chassisNumber ?? "N/A"}'),
-            Text('Engine No: ${details?.engineNumber ?? "N/A"}'),
-            Text('Insurance: ${details?.insuranceCompanyName ?? "N/A"}'),
-            const Divider(),
-            Text('Battery No: ${accessories?.accessoriesBattaeryNumber ?? "N/A"}'),
-            Text('Type: ${accessories?.accessoriesType ?? "N/A"}'),
-            Text('Other Accessories: ${accessories?.anyotherAccessories ?? "N/A"}'),
-            Text('Remark: ${accessories?.anyRemark ?? "N/A"}'),
-            if (accessories?.accessories != null && accessories!.accessories!.isNotEmpty) ...[
-              SizedBox(height: 5),
-              Text('Accessories:', style: TextStyle(fontWeight: FontWeight.bold)),
-              ...accessories.accessories!.map((e) => Text('- ${e.name ?? ""} : ${e.present == true ? "Yes" : "No"}')),
-            ],
-            const Divider(),
-            Text('Scratches: ${scratches?.scratches ?? "N/A"}'),
-            Text('Dent: ${scratches?.dent ?? "N/A"}'),
-            Text('Other Observations: ${scratches?.anyOtherVisibleObservation ?? "N/A"}'),
-          ],
-        ),
-      ),
-    );*//*
-
-    Container(
-      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.black, width: 1),
-      ),
-      child: Column(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              color: Color(0xFF137DC7),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
-            ),
-            height: 40,
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Row(
-              children: [
-                Text('${index + 1}', style: const TextStyle(color: Colors.white,fontSize: 14,fontWeight: FontWeight.bold)),
-                const Spacer(),
-                Text('CAR CONDITION:${index + 1}', style: const TextStyle(color: Colors.white,fontSize: 14,fontWeight: FontWeight.bold)),
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(title: 'Car Condition Reports'),
-      body:
-      SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(16.0),
-          color: Colors.white,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Download', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 15),
-              Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => _selectDate(context, startDateController),
-                      child: AbsorbPointer(
-                        child: inputTextFields(
-                          label: 'Start Date',
-                          textEditingController: startDateController,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => _selectDate(context, endDateController),
-                      child: AbsorbPointer(
-                        child: inputTextFields(
-                          label: 'End Date',
-                          textEditingController: endDateController,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              CustomButton(label: 'Download Reports', onPressed: _downloadReport),
-              const SizedBox(height: 20),
-              reportData.isNotEmpty
-                  ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: reportData.map(_buildReportCard).toList(),
-              )
-                  : const Text('No data found. Please try different dates.', style: TextStyle(color: Colors.grey)),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-*/
-
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-
+import 'package:share_plus/share_plus.dart';
 import '../../../../core/widgets/custom_Textbutton.dart';
 import '../../../../core/widgets/custom_app_bar/ui/customAppBar.dart';
 import '../../../../core/widgets/custom_input_text_field.dart';
 import '../../../../core/widgets/custom_more_horiz_scroll_page.dart';
 import '../../../homescreen_documents_pdf/car_condition_pdf/car_condition_edit_screen/car_condition_edit_screen.dart';
 import '../../../homescreen_documents_pdf/car_condition_pdf/car_condition_pdf/car_condition_pdf.dart';
+import '../../../homescreen_documents_pdf/car_condition_pdf/car_condition_pdf/download_car_pdf.dart';
+import '../../../homescreen_documents_pdf/car_condition_pdf/car_condition_pdf/share_car_pdf.dart';
 import '../../../homescreen_documents_pdf/car_condition_pdf/provider/car_condition_pdf_provider.dart';
-import '../../../homescreen_documents_pdf/survey_pdf/servey_pdf_share/servey_pdf_share.dart';
+import '../../../homescreen_documents_pdf/quotation_pdf/provider/quotation_pdf_provider.dart';
+import '../../../homescreen_documents_pdf/quotation_pdf/quotation_webview_pdf/loding_page.dart';
+import '../../../homescreen_documents_pdf/quotation_pdf/subscription_pdf/subscription_pdf_provider.dart';
 import '../model/car_condition_report_model.dart';
 import '../repo/car_condition_report_repogistory.dart';
 
@@ -229,9 +29,7 @@ class _CarConditionRepotsDownloadState extends State<CarConditionRepotsDownload>
   final TextEditingController endDateController = TextEditingController();
 
   final CarConditionReportRepogistory _repo = CarConditionReportRepogistory();
-
   List<Data> reportData = [];
-
   Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -247,7 +45,6 @@ class _CarConditionRepotsDownloadState extends State<CarConditionRepotsDownload>
   void _downloadReport() async {
     String startDate = startDateController.text.trim();
     String endDate = endDateController.text.trim();
-
     if (startDate.isEmpty || endDate.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select both start and end date')),
@@ -268,10 +65,7 @@ class _CarConditionRepotsDownloadState extends State<CarConditionRepotsDownload>
     }
   }
   bool isLoading = false;
-  // Updated _buildReportCard to include index
   Widget _buildReportCard(Data item, int index) {
-    final condition = item.formData?.vehicleConditionDetails;
-
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       decoration: BoxDecoration(
@@ -307,8 +101,6 @@ class _CarConditionRepotsDownloadState extends State<CarConditionRepotsDownload>
             ),
           ),
           const SizedBox(height: 10),
-
-          // Phone number row
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Row(
@@ -392,7 +184,6 @@ class _CarConditionRepotsDownloadState extends State<CarConditionRepotsDownload>
           const Divider(height: 2, color: Colors.grey),
           const SizedBox(height: 10),
 
-          // Bottom section
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Row(
@@ -506,15 +297,13 @@ class _CarConditionRepotsDownloadState extends State<CarConditionRepotsDownload>
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              // builder: (context) => SurveyPdfWebViewScreen(id: yourIdHere), // Replace with actual ID
-                              builder: (context) => CarConditionPdfWebViewScreen(id: item.sId ?? ''),
-
+                              builder: (context) => CarPdfWebViewScreen(id: item.sId ?? ''),
                             ),
                           );
                         },
                         child: Container(
                           padding: EdgeInsets.all(5),
-                          margin: EdgeInsets.only(left: 4), // spacing between two containers
+                          margin: EdgeInsets.only(left: 4),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(10),
@@ -551,10 +340,28 @@ class _CarConditionRepotsDownloadState extends State<CarConditionRepotsDownload>
                   children: [
                     Expanded(
                       child: InkWell(
-                        onTap: () {
-                          PdfDownloadershare.downloadAndSharePdf(
-                            "http://167.71.232.245:8970/api/user/quotation/${item.sId}/pdf",
-                          );
+                        onTap: () async {
+                          if (item.sId != null) {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) => LoadingDialog(),
+                            );
+                            final provider =
+                            Provider.of<QuatationPdfProvider>(context, listen: false);
+                            await provider.fetchQuotationSignature(item.sId!, "car");
+                            if (provider.signatureLink != null) {
+                              final link = provider.signatureLink!;
+                              await Share.share(
+                                "Here is the customer signature PDF link:\n$link",
+                                subject: "Customer Signature PDF",
+                              );
+                            } else {
+                              print(" Signature link is null");
+                            }
+                          } else {
+                            print(" item.sId is null");
+                          }
                         },
                         child: Container(
                           padding: EdgeInsets.all(5),
@@ -578,14 +385,20 @@ class _CarConditionRepotsDownloadState extends State<CarConditionRepotsDownload>
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  //Text('Customer Signature',
-                                  Text('Customer Sign..',
-                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                                    overflow: TextOverflow.ellipsis,  // show ...
-                                    maxLines: 2,                      // single line only
+                                  Text(
+                                    'Customer Sign..',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
                                     softWrap: true,
                                   ),
-                                  Text('ग्राहक के हस्ताक्षर', style: TextStyle(fontSize: 12)),
+                                  Text(
+                                    'ग्राहक के हस्ताक्षर',
+                                    style: TextStyle(fontSize: 12),
+                                  ),
                                 ],
                               ),
                             ],
@@ -594,58 +407,38 @@ class _CarConditionRepotsDownloadState extends State<CarConditionRepotsDownload>
                       ),
                     ),
 
-                   /* Expanded(
-                      child: InkWell(
-                        onTap: () {
-                          PdfDownloadershare.downloadAndSharePdf(
-                            "http://167.71.232.245:8970/api/user/carCondition/${item.sId}/pdf",
-                          );
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(5),
-                          margin: EdgeInsets.only(left: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black26,
-                                blurRadius: 6,
-                                spreadRadius: 2,
-                                offset: Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.picture_as_pdf, color: Colors.black),
-                              SizedBox(width: 5),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Share Car Pdf',
-                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                                  Text('कार पीडीएफ भेजें', style: TextStyle(fontSize: 12)),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),*/
                     Expanded(
                       child: InkWell(
-                        onTap: isLoading
-                            ? null
-                            : () async {
-                          setState(() => isLoading = true);
-
-                          final url =
-                              "http://167.71.232.245:8970/api/user/carCondition/${item.sId}/pdf";
-
-                          await PdfDownloadershare.downloadAndSharePdf(url);
-
-                          setState(() => isLoading = false);
+                        onTap: () async {
+                          if (item.sId != null) {
+                            final subscriptionProvider =
+                            Provider.of<SubscriptionPdfProvider>(context, listen: false);
+                            if (!subscriptionProvider.isSubscribed) {
+                              showDialog(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: const Text("Subscription Required"),
+                                  content: const Text(
+                                      "You are not subscribed. Please subscribe to share PDFs."),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.of(ctx).pop(),
+                                      child: const Text("OK"),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              return;
+                            }
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) => LoadingDialog(),
+                            );
+                            await PdfDownloadersharecar.downloadAndSharePdf(item.sId!);
+                          } else {
+                            print(" item.sId is null");
+                          }
                         },
                         child: Container(
                           padding: const EdgeInsets.all(5),
@@ -703,7 +496,6 @@ class _CarConditionRepotsDownloadState extends State<CarConditionRepotsDownload>
                         onTap: () async {
                           final String userId = item.sId ?? "";
                           print("userId");
-
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -753,10 +545,36 @@ class _CarConditionRepotsDownloadState extends State<CarConditionRepotsDownload>
 
                     Expanded(
                       child: InkWell(
-                        onTap: () {
-                          PdfDownloader.downloadAndOpenPdf(
-                            "http://167.71.232.245:8970/api/user/carCondition/${item.sId}/pdf",
-                          );
+                        onTap: () async {
+                          if (item.sId != null) {
+                            final subscriptionProvider =
+                            Provider.of<SubscriptionPdfProvider>(context, listen: false);
+                            if (!subscriptionProvider.isSubscribed) {
+                              showDialog(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: const Text("Subscription Required"),
+                                  content: const Text(
+                                      "You are not subscribed. Please subscribe to download PDFs."),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.of(ctx).pop(),
+                                      child: const Text("OK"),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              return;
+                            }
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) => LoadingDialog(),
+                            );
+                            await PdfDownloadercar.downloadAndOpenPdf(item.sId!);
+                          } else {
+                            print(" item.sId is null");
+                          }
                         },
                         child: Container(
                           padding: EdgeInsets.all(5),
@@ -794,7 +612,7 @@ class _CarConditionRepotsDownloadState extends State<CarConditionRepotsDownload>
                           ),
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ],

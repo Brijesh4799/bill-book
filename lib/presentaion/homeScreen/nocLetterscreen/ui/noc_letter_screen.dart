@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/utils/helperFuntions.dart';
 import '../../../../core/widgets/custom_app_bar/ui/customAppBar.dart';
-import '../../../../core/widgets/custom_Textbutton.dart';
 import '../../../../core/widgets/custom_dropDown.dart';
 import '../../../../core/widgets/custom_input_text_field.dart';
 import '../../home_controller.dart';
@@ -11,15 +10,12 @@ import '../provider/nocletter_provider.dart';
 class NOCLetterScreen extends StatefulWidget {
   final String mobileNumber;
   const NOCLetterScreen({Key? key, required this.mobileNumber}) : super(key: key);
-
-
   @override
   _NOCLetterScreen createState() => _NOCLetterScreen();
 }
 
 class _NOCLetterScreen extends State<NOCLetterScreen> {
   String? nocTypeValue;
-
   final TextEditingController nocDateController = TextEditingController();
   final TextEditingController nocLrNumberController = TextEditingController();
   final TextEditingController nocLrDateController = TextEditingController();
@@ -29,14 +25,7 @@ class _NOCLetterScreen extends State<NOCLetterScreen> {
   final TextEditingController nocMoveFromCityController = TextEditingController();
   final TextEditingController nocMoveToCityController = TextEditingController();
 
-
-  void _saveAllValues() {
-
-  }
-
-
   @override
-
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: 'NOC Letter'),
@@ -51,7 +40,6 @@ class _NOCLetterScreen extends State<NOCLetterScreen> {
           ],
         ),
       ),
-
         bottomNavigationBar: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(12.0),
@@ -61,29 +49,24 @@ class _NOCLetterScreen extends State<NOCLetterScreen> {
                   onPressed: () async {
                     HelperFunctions helper = HelperFunctions();
                     bool isConnected = await helper.isConnected();
-
                     if (!isConnected) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('No internet connection')),
                       );
                       return;
                     }
-
-
                     await provider.nocletter(
                       mobileNumber: widget.mobileNumber,
                       context: context,
                     );
-
-
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => HomeNavController()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 50), // Full width button
-                    backgroundColor: Colors.blue, // Customize as needed
+                    minimumSize: Size(double.infinity, 50),
+                    backgroundColor: Colors.blue,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -97,7 +80,6 @@ class _NOCLetterScreen extends State<NOCLetterScreen> {
             ),
           ),
         )
-
     );
   }
 

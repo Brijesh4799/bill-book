@@ -3,18 +3,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../../../core/utils/helperFuntions.dart';
 import '../../../../core/widgets/custom_app_bar/ui/customAppBar.dart';
 import '../../../../core/widgets/custom_input_text_field.dart';
-import '../../../homeScreen/carConditionScreen/provider/car_condition_provider.dart';
 import '../../../homeScreen/home_controller.dart';
 import '../provider/car_condition_pdf_provider.dart';
 
 class CarConditionEditScreen extends StatefulWidget {
   final String id;
   const CarConditionEditScreen({Key? key, required this.id}) : super(key: key);
-  //const CarConditionEditScreen({super.key});
 
   @override
   _CarConditionEditScreen createState() => _CarConditionEditScreen();
@@ -29,7 +26,6 @@ class _CarConditionEditScreen extends State<CarConditionEditScreen> {
   final TextEditingController vehicleDateController = TextEditingController();
   final TextEditingController moveFromVehicleController = TextEditingController();
   final TextEditingController moveToVehicleController = TextEditingController();
-
   final TextEditingController vehicleTypeController = TextEditingController();
   final TextEditingController vehicleBrandNameController = TextEditingController();
   final TextEditingController vehicleValueController = TextEditingController();
@@ -61,21 +57,14 @@ class _CarConditionEditScreen extends State<CarConditionEditScreen> {
   ];
 
   final Map<String, String> selectedAccessories = {};
-
   final TextEditingController batteryNoController = TextEditingController();
   final TextEditingController tyreNoController = TextEditingController();
   final TextEditingController otherAccessoriesController = TextEditingController();
   final TextEditingController remarkController = TextEditingController();
-
-
   final TextEditingController scratchesController = TextEditingController();
   final TextEditingController dentController = TextEditingController();
   final TextEditingController otherVisibleObservationController = TextEditingController();
 
-
-  void _saveAllValues() {
-
-  }
   void initState(){
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -85,7 +74,6 @@ class _CarConditionEditScreen extends State<CarConditionEditScreen> {
   }
 
   @override
-
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: CustomAppBar(title: 'Car Condition'),
@@ -102,51 +90,6 @@ class _CarConditionEditScreen extends State<CarConditionEditScreen> {
             ],
           ),
         ),
-       /* bottomNavigationBar: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Consumer<CarConditionProvider>(
-              builder: (context, provider, child) {
-                return ElevatedButton(
-                  onPressed: () async {
-                    HelperFunctions helper = HelperFunctions();
-                    bool isConnected = await helper.isConnected();
-
-                    if (!isConnected) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('No internet connection')),
-                      );
-                      return;
-                    }
-
-                    // Call the provider's method
-                    await provider.carconditionprovider(
-                      //mobileNumber: widget.mobileNumber,
-                      context: context, mobileNumber: '',
-                    );
-
-                    // Navigate to Home Page
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomeNavController()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 50), // Full width button
-                    backgroundColor: Colors.blue, // Customize as needed
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    'Save Vehicle Condition',
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                );
-              },
-            ),
-          ),
-        )*/
 
         bottomNavigationBar: SafeArea(
           child: Padding(
@@ -155,21 +98,18 @@ class _CarConditionEditScreen extends State<CarConditionEditScreen> {
               builder: (context, provider, child) {
                 return ElevatedButton(
                   onPressed: provider.isLoading
-                      ? null // Disable button while loading
+                      ? null
                       : () async {
                     HelperFunctions helper = HelperFunctions();
                     bool isConnected = await helper.isConnected();
-
                     if (!isConnected) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('No internet connection')),
                       );
                       return;
                     }
-
                     String id = widget.id;
                     await provider.updateCarCondition(id);
-
                     if (provider.errorMessage != null) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text(provider.errorMessage!)),
@@ -203,12 +143,8 @@ class _CarConditionEditScreen extends State<CarConditionEditScreen> {
             ),
           ),
         ),
-
-
     );
   }
-
-
 
   Widget _buildVehicleConditionDetailsTile(){
     return Consumer<CarConditionPdfProvider>(

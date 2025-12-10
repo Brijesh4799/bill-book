@@ -1,6 +1,9 @@
 
 
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../get_by-id_model/payment_get_by_id_model.dart';
 import '../model/payment_voucher_pdf_model.dart';
@@ -30,23 +33,71 @@ class PaymentPdfProvider with ChangeNotifier{
   String? get errorMessage => _errorMessage;
 
 
-  Future<void> fetchpaymentData() async {
+  // Future<void> fetchpaymentData() async {
+  //   _isLoading = true;
+  //   _errorMessage = null;
+  //   notifyListeners();
+  //   try {
+  //     _paymentvoucher = await _paymentPdfRepository.getPaymentData();
+  //   } catch (e) {
+  //     _errorMessage = 'Failed to load survey list: ${e.toString()}';
+  //   } finally {
+  //     _isLoading = false;
+  //     notifyListeners();
+  //   }
+  // }
 
-    _isLoading = true;
-    _errorMessage = null;
+  bool isLoading2 = false;
+  bool loading = false;
+  bool isLoadMoreRunning = false;
+  bool hasNextPage = true;
+  int page = 1;
+  void setLoading(bool loader) {
+    loading = loader;
     notifyListeners();
-
-    try {
-      _paymentvoucher = await _paymentPdfRepository.getPaymentData();
-
-
-    } catch (e) {
-      _errorMessage = 'Failed to load survey list: ${e.toString()}';
-    } finally {
-      _isLoading = false;
+  }
+  Future<void> fetchpaymentData({bool isLoadMore = false}) async {
+    if (!isLoadMore) {
+      page = 1;
+      hasNextPage = true;
+      _paymentvoucher = null;
+      setLoading(true);
+    } else {
+      if (isLoadMoreRunning || !hasNextPage) return;
+      isLoadMoreRunning = true;
       notifyListeners();
     }
+    try {
+      final response = await _paymentPdfRepository.getPaymentData(pageCount: page);
+      if (response.status == true &&
+          response.data != null &&
+          response.data!.isNotEmpty) {
+        if (isLoadMore) {
+          _paymentvoucher!.data!.addAll(response.data!);
+        } else {
+          _paymentvoucher = response;
+        }
+        page++;
+      } else {
+        hasNextPage = false;
+      }
+    } catch (e) {
+      print("Pagination Error: $e");
+      hasNextPage = false;
+    } finally {
+      if (!isLoadMore) {
+        setLoading(false);
+      } else {
+        isLoadMoreRunning = false;
+        notifyListeners();
+      }
+    }
   }
+
+
+
+
+
   final _repo = PaymentPdfRepository();
   Future<bool> deletepayment(String id) async {
     try {
@@ -134,6 +185,41 @@ class PaymentPdfProvider with ChangeNotifier{
       print(_errorMessage);
     }
   }
+
+  String? pdfLocalPath;
+  bool pdfLoading = false;
+  String? _errorMessage2;
+
+  String? get errorMessage2 => _errorMessage2;
+
+  Future<void> fetchpaymentPdf(String id) async {
+    pdfLoading = true;
+    _errorMessage2 = null;
+    notifyListeners();
+
+    try {
+      final responseBytes = await  _paymentPdfRepository.paymentpdfApi(id);
+
+      if (responseBytes != null) {
+        // Save PDF in temporary directory
+        final dir = await getTemporaryDirectory();
+        final file = File('${dir.path}/payment_$id.pdf');
+        await file.writeAsBytes(responseBytes);
+
+        pdfLocalPath = file.path;
+        print("✅ PDF saved at: $pdfLocalPath");
+      } else {
+        _errorMessage2 = "Empty PDF response";
+      }
+    } catch (e) {
+      _errorMessage2 = "Failed to fetch PDF: $e";
+      print(_errorMessage2);
+    } finally {
+      pdfLoading = false;
+      notifyListeners();
+    }
+  }
+
 
 }
 

@@ -1,8 +1,6 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../../../core/utils/helperFuntions.dart';
 import '../../../../core/widgets/custom_app_bar/ui/customAppBar.dart';
 import '../../../../core/widgets/custom_checkBox.dart';
@@ -21,9 +19,6 @@ class BillEditScreen  extends StatefulWidget {
 }
 
 class _BillEditScreen  extends State<BillEditScreen > {
-
-  //pre invoice detail
-
   final TextEditingController preInvoiceNumberController = TextEditingController(text: '0001');
   final TextEditingController companyNameController = TextEditingController();
   final TextEditingController invoiceDateController = TextEditingController();
@@ -35,10 +30,6 @@ class _BillEditScreen  extends State<BillEditScreen > {
   final TextEditingController moveToController = TextEditingController();
   final TextEditingController vehicleNumberController = TextEditingController();
   final TextEditingController lrNumberController = TextEditingController();
-
-
-
-// Text controllers for consignee details
   final TextEditingController consigneeNameController = TextEditingController();
   final TextEditingController consigneePhoneController = TextEditingController();
   final TextEditingController consigneeGstinController = TextEditingController();
@@ -48,7 +39,6 @@ class _BillEditScreen  extends State<BillEditScreen > {
   final TextEditingController consigneePincodeController = TextEditingController();
   final TextEditingController consigneeAddressController = TextEditingController();
 
-// Charge option dropdowns
   String? packingChargeOption;
   String? unpackingChargeOption;
   String? loadingChargeOption;
@@ -60,8 +50,6 @@ class _BillEditScreen  extends State<BillEditScreen > {
   String? gstTypeOption;
   String? reverseChargeOption;
   String? gstPaidByOption;
-
-// Text controllers
   final TextEditingController freightChargeController = TextEditingController();
   final TextEditingController advancePaidController = TextEditingController();
   final TextEditingController packingChargeController = TextEditingController();
@@ -79,7 +67,6 @@ class _BillEditScreen  extends State<BillEditScreen > {
   final TextEditingController paymentRemarkController = TextEditingController();
   final TextEditingController discountController = TextEditingController();
 
-// Dropdown option lists
   final List<String> chargeOptions = [
     'Included in Freight', 'Excluded', 'Not Applicable'
   ];
@@ -101,7 +88,7 @@ class _BillEditScreen  extends State<BillEditScreen > {
   final List<String> gstPaidByOptions = [
     'Consignee', 'Consignor'
   ];
-// Text controllers for billing details
+
   final TextEditingController billToNameController = TextEditingController();
   final TextEditingController billToPhoneController = TextEditingController();
   final TextEditingController billToGstinController = TextEditingController();
@@ -110,28 +97,21 @@ class _BillEditScreen  extends State<BillEditScreen > {
   final TextEditingController billToCityController = TextEditingController();
   final TextEditingController billToPincodeController = TextEditingController();
   final TextEditingController billToAddressController = TextEditingController();
-
-// Package Details Controllers
   final TextEditingController packageController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController totalWeightController = TextEditingController();
   final TextEditingController receiveConditionController = TextEditingController();
   final TextEditingController remarkController = TextEditingController();
 
-// Dropdown variable for Package Details
   String? weightUnitOption;
-
   String? selectedInsuranceType;
   String? selectedInsuranceChargePercent;
   String? selectedGstValue;
   final TextEditingController declarationGoodsValueController = TextEditingController();
-
   String? selectedVehicleInsuranceType;
   String? selectedVehicleInsuranceChargePercent;
   String? selectedVehicleGstValue;
   final TextEditingController declarationVehicleValueController = TextEditingController();
-
-  // Consignor Details Controllers
   final TextEditingController consignorNameController = TextEditingController();
   final TextEditingController consignorPhoneController = TextEditingController();
   final TextEditingController consignorGstinController = TextEditingController();
@@ -140,12 +120,7 @@ class _BillEditScreen  extends State<BillEditScreen > {
   final TextEditingController consignorCityController = TextEditingController();
   final TextEditingController consignorPincodeController = TextEditingController();
   final TextEditingController consignorAddressController = TextEditingController();
-
-// Checkbox state for "Same as Billing"
   bool isConsignorSameAsBilling = true;
-
-  void _SaveAllValues() {
-  }
 
   void initState(){
     super.initState();
@@ -176,7 +151,6 @@ class _BillEditScreen  extends State<BillEditScreen > {
             ],
           ),
         ),
-
         bottomNavigationBar: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(12.0),
@@ -186,26 +160,20 @@ class _BillEditScreen  extends State<BillEditScreen > {
                   onPressed: () async {
                     HelperFunctions helper = HelperFunctions();
                     bool isConnected = await helper.isConnected();
-
                     if (!isConnected) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('No internet connection')),
                       );
                       return;
                     }
-
-                    // Make sure you pass the correct billId here
-                    String billId = widget.id ?? ""; // Replace with your actual billId source
-
+                    String billId = widget.id ?? "";
                     if (billId.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Bill ID is missing')),
                       );
                       return;
                     }
-
                     final updatedBill = await provider.updateBillById(billId);
-
                     if (updatedBill != null) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Bill updated successfully!')),
@@ -238,11 +206,8 @@ class _BillEditScreen  extends State<BillEditScreen > {
             ),
           ),
         ),
-
     );
   }
-
-
   Widget _buildInvoiceBillDetails(){
     return Consumer<BillPdfProvider>(
         builder: (context, provider, child){
@@ -421,7 +386,6 @@ class _BillEditScreen  extends State<BillEditScreen > {
         }
     );
   }
-
   Widget _buildConsignorDetailsTile(){
     return Consumer<BillPdfProvider>(
         builder: (context, provider, child){

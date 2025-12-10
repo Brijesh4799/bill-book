@@ -11,14 +11,11 @@ import '../provider/payment_voucher_provider.dart';
 class PayementVoucherScreen extends StatefulWidget {
   final String mobileNumber;
   const PayementVoucherScreen({Key? key, required this.mobileNumber}) : super(key: key);
-  //const PayementVoucherScreen({super.key});
-
   @override
   _PayementVoucherScreen createState() => _PayementVoucherScreen();
 }
 
 class _PayementVoucherScreen extends State<PayementVoucherScreen> {
-
   final TextEditingController voucherNumberController = TextEditingController();
   final TextEditingController voucherDateController = TextEditingController();
   final TextEditingController receiverNameController = TextEditingController();
@@ -31,14 +28,7 @@ class _PayementVoucherScreen extends State<PayementVoucherScreen> {
   String? paymentTypeValue;
   String? paymentModeValue;
 
-
-  void _saveAllValues() {
-
-  }
-
-
   @override
-
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: 'Payment Voucher'),
@@ -52,7 +42,6 @@ class _PayementVoucherScreen extends State<PayementVoucherScreen> {
           ],
         ),
       ),
-
         bottomNavigationBar: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(12.0),
@@ -62,29 +51,24 @@ class _PayementVoucherScreen extends State<PayementVoucherScreen> {
                   onPressed: () async {
                     HelperFunctions helper = HelperFunctions();
                     bool isConnected = await helper.isConnected();
-
                     if (!isConnected) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('No internet connection')),
                       );
                       return;
                     }
-
-                    // Call the provider's method
                     await provider.paymentvoucherprovider(
                       mobileNumber: widget.mobileNumber,
                       context: context,
                     );
-
-                    // Navigate to Home Page
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => HomeNavController()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 50), // Full width button
-                    backgroundColor: Colors.blue, // Customize as needed
+                    minimumSize: Size(double.infinity, 50),
+                    backgroundColor: Colors.blue,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -100,7 +84,6 @@ class _PayementVoucherScreen extends State<PayementVoucherScreen> {
         )
     );
   }
-
 
   Widget _buildPaymentVoucherDetailsTile(){
     return Consumer<PaymentVoucherProvider>(

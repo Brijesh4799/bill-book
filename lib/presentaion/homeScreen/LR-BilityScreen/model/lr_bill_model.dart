@@ -153,18 +153,21 @@ class FormData {
 
 class LrDetails {
   String? lrNumber;
+  String? risktype;
   String? lrDate;
 
-  LrDetails({this.lrNumber, this.lrDate});
+  LrDetails({this.lrNumber, this.lrDate, this.risktype});
 
   LrDetails.fromJson(Map<String, dynamic> json) {
     lrNumber = json['lrNumber'];
+    risktype = json['risktype'];
     lrDate = json['lrDate'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['lrNumber'] = this.lrNumber;
+    data['risktype'] = this.risktype;
     data['lrDate'] = this.lrDate;
     return data;
   }
@@ -311,6 +314,7 @@ class PackageDetails {
   String? packageNumber;
   String? packageDescription;
   String? packageActualWeight;
+  String? changeWeight;
   String? packageChangeWeight;
   String? receivePackageCondition;
   String? packageRemark;

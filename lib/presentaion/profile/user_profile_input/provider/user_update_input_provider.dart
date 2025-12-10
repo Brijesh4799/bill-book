@@ -27,7 +27,8 @@ class UserUpdateInputProvider with ChangeNotifier{
         phoneController.text = response.user?.mobileNo ?? '';
         stateController.text = response.user?.state ?? '';
         cityController.text = response.user?.city ?? '';
-        pincodeController.text = response.user?.pincode ?? '';
+        //pincodeController.text = response.user?.pincode ?? '';
+        pincodeController.text = response.user?.pincode?.toString() ?? '';
         addressController.text = response.user?.address ?? '';
       }
     } catch (e) {
@@ -37,7 +38,37 @@ class UserUpdateInputProvider with ChangeNotifier{
     notifyListeners();
   }
 
-  Future<void> userupdateprovider({
+  Future<bool> userupdateprovider({
+    required String mobileNumber,
+    required BuildContext context,
+  }) async {
+    final billRepository = UserProfileInput();
+    try {
+      var response = await billRepository.userUpdateApi({
+        'name': nameController.text.trim(),
+        'email': emailController.text.trim(),
+        'mobileNo': phoneController.text.trim(),
+        'state': stateController.text.trim(),
+        'city': cityController.text.trim(),
+        'pincode': pincodeController.text.trim(),
+        'address': addressController.text.trim(),
+      });
+
+      if (response != null && response.user != null) {
+        print("Profile updated successfully: ${response.user?.name}");
+        return true;
+      } else {
+        print("Failed to parse response.");
+        return false;
+      }
+    } catch (e) {
+      print('Update error: $e');
+      return false;
+    }
+  }
+
+
+/*Future<void> userupdateprovider({
     required String mobileNumber, // you may remove if not needed
     required BuildContext context,
   }) async {
@@ -63,7 +94,7 @@ class UserUpdateInputProvider with ChangeNotifier{
       print( 'Update error: $e');
     }
     notifyListeners();
-  }
+  }*/
 
 }
 

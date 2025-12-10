@@ -11,8 +11,6 @@ import '../provider/money_receipt_provider.dart';
 class MoneyReceiptScreen extends StatefulWidget {
   final String mobileNumber;
   const MoneyReceiptScreen({Key? key, required this.mobileNumber}) : super(key: key);
- // const MoneyReceiptScreen({super.key});
-
   @override
   _MoneyReceiptScreen createState() => _MoneyReceiptScreen();
 }
@@ -33,19 +31,11 @@ class _MoneyReceiptScreen extends State<MoneyReceiptScreen> {
   final TextEditingController remarkController = TextEditingController();
 
 // Dropdown values
-  String receiptAgainstValue = 'Bill'; // or 'Quotation'
-  String paymentTypeValue = 'Part';    // or 'Full'
-  String paymentModeValue = 'Cash';    // or 'UPI', 'Bank Transfer'
-
-
-
-  void _saveAllValues() {
-
-  }
-
+  String receiptAgainstValue = 'Bill';
+  String paymentTypeValue = 'Part';
+  String paymentModeValue = 'Cash';
 
   @override
-
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: 'MONEY RECEIPT'),
@@ -69,21 +59,16 @@ class _MoneyReceiptScreen extends State<MoneyReceiptScreen> {
                   onPressed: () async {
                     HelperFunctions helper = HelperFunctions();
                     bool isConnected = await helper.isConnected();
-
                     if (!isConnected) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('No internet connection')),
                       );
                       return;
                     }
-
-                    // Call the provider's method
                     await provider.moneyovider(
                       mobileNumber: widget.mobileNumber,
                       context: context,
                     );
-
-                    // Navigate to Home Page
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => HomeNavController()),
@@ -108,10 +93,6 @@ class _MoneyReceiptScreen extends State<MoneyReceiptScreen> {
 
     );
   }
-
-
-
-
   Widget _buildMoneyReceiptDetailsTile(){
     return Consumer<MoneyReceiptProvider>(
         builder: (context, provider, child){

@@ -2,7 +2,10 @@
 
 
 
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../get_byid_model/proforma_getbyid_model.dart';
 import '../model/proforma_pdf_model.dart';
@@ -99,23 +102,73 @@ class ProformaPdfProvider with ChangeNotifier{
   String? get errorMessage => _errorMessage;
 
 
-  Future<void> fetchProformaData() async {
+  // Future<void> fetchProformaData() async {
+  //   _isLoading = true;
+  //   _errorMessage = null;
+  //   notifyListeners();
+  //   try {
+  //     _proformalist = await _proformaPdfRepository.getProformaData();
+  //   } catch (e) {
+  //     _errorMessage = 'Failed to load survey list: ${e.toString()}';
+  //   } finally {
+  //     _isLoading = false;
+  //     notifyListeners();
+  //   }
+  // }
 
-    _isLoading = true;
-    _errorMessage = null;
+  bool isLoading2 = false;
+  bool loading = false;
+  bool isLoadMoreRunning = false;
+  bool hasNextPage = true;
+  int page = 1;
+  void setLoading(bool loader) {
+    loading = loader;
     notifyListeners();
-
-    try {
-      _proformalist = await _proformaPdfRepository.getProformaData();
-
-
-    } catch (e) {
-      _errorMessage = 'Failed to load survey list: ${e.toString()}';
-    } finally {
-      _isLoading = false;
+  }
+  Future<void> fetchProformaData({bool isLoadMore = false}) async {
+    if (!isLoadMore) {
+      page = 1;
+      hasNextPage = true;
+      _proformalist = null;
+      setLoading(true);
+    } else {
+      if (isLoadMoreRunning || !hasNextPage) return;
+      isLoadMoreRunning = true;
       notifyListeners();
     }
+    try {
+      final response = await _proformaPdfRepository.getProformaData(pageCount: page);
+      if (response.status == true &&
+          response.data != null &&
+          response.data!.isNotEmpty) {
+        if (isLoadMore) {
+          _proformalist!.data!.addAll(response.data!);
+        } else {
+          _proformalist = response;
+        }
+        page++;
+      } else {
+        hasNextPage = false;
+      }
+    } catch (e) {
+      print("Pagination Error: $e");
+      hasNextPage = false;
+    } finally {
+      if (!isLoadMore) {
+        setLoading(false);
+      } else {
+        isLoadMoreRunning = false;
+        notifyListeners();
+      }
+    }
   }
+
+
+
+
+
+
+
   final _repo = ProformaPdfRepository();
   Future<bool> deleteproforma(String id) async {
     try {
@@ -467,6 +520,42 @@ class ProformaPdfProvider with ChangeNotifier{
       notifyListeners();
     }
   }
+
+
+  String? pdfLocalPath;
+  bool pdfLoading = false;
+  String? _errorMessage2;
+
+  String? get errorMessage2 => _errorMessage2;
+
+  Future<void> fetchproformaPdf(String id) async {
+    pdfLoading = true;
+    _errorMessage2 = null;
+    notifyListeners();
+
+    try {
+      final responseBytes = await  _proformaPdfRepository.proformapdfApi(id);
+
+      if (responseBytes != null) {
+        // Save PDF in temporary directory
+        final dir = await getTemporaryDirectory();
+        final file = File('${dir.path}/quotation_$id.pdf');
+        await file.writeAsBytes(responseBytes);
+
+        pdfLocalPath = file.path;
+        print("✅ PDF saved at: $pdfLocalPath");
+      } else {
+        _errorMessage2 = "Empty PDF response";
+      }
+    } catch (e) {
+      _errorMessage2 = "Failed to fetch PDF: $e";
+      print(_errorMessage2);
+    } finally {
+      pdfLoading = false;
+      notifyListeners();
+    }
+  }
+
 
 
 }

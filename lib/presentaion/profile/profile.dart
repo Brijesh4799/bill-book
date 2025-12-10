@@ -200,14 +200,18 @@ class ProfileScreen extends StatelessWidget {
 */
 
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../WebServices/app_url.dart';
 import '../../core/widgets/custom_app_bar/provider/profile_provider.dart';
 import '../../core/widgets/custom_app_bar/ui/customAppBar.dart';
 import '../../core/widgets/custom_image_view.dart';
 import '../homeScreen/reportDownloadsScreen/download_report_List.dart';
 import '../homescreen_documents_pdf/fov_scf_form_pdf/ui/fov_scf_form_pdf.dart';
 import 'bill_invoice_setting_screen.dart';
+import 'business_details_screen/provider/business_provider.dart';
 import 'business_details_screen/ui/bussiness_detaills_screen.dart';
 import 'package:BillBook/presentaion/profile/quotation_setting_screen.dart';
 import 'package:BillBook/presentaion/profile/user_profile.dart';
@@ -221,7 +225,8 @@ class ProfileScreen extends StatelessWidget {
   String getProfileImageUrl(String? path) {
     if (path == null || path.isEmpty) return '';
     final cleanPath = path.replaceAll('\\', '/'); // replace backslashes
-    return 'http://167.71.232.245:8970/$cleanPath';
+    return '${AppUrl.baseUrl}/$cleanPath';
+
   }
 
   @override
@@ -232,6 +237,8 @@ class ProfileScreen extends StatelessWidget {
     // Fetch profile data on first build
     Future.microtask(() {
       Provider.of<GetProfileProvider>(context, listen: false).profiledataData();
+      final provider = Provider.of<BusinessProvider>(context, listen: false);
+      provider.fetchBusinessDetails();
     });
 
     return Scaffold(
@@ -260,52 +267,7 @@ class ProfileScreen extends StatelessWidget {
               SizedBox(height: 35,),
 
 
-              // Dynamic Profile Card
-              /*Card(
-                color: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                elevation: 4,
-                child: Column(
-                  children: [
-                    const SizedBox(height: 16),
-                    CircleAvatar(
-                      radius: screenWidth * 0.1,
-                      backgroundColor: Colors.yellow[700],
-                      child: ClipOval(
-                        child: imageUrl.isNotEmpty
-                            ? Image.network(
-                          imageUrl,
-                          width: screenWidth * 0.2,
-                          height: screenWidth * 0.2,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) =>
-                          const Icon(Icons.person, size: 40),
-                        )
-                            : const Icon(Icons.person, size: 40),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      name,
-                      style: TextStyle(
-                        fontSize: screenWidth * 0.04,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'ID: $id',
-                      style: TextStyle(
-                        fontSize: screenWidth * 0.025,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                ),
-              ),*/
+
               Card(
                 color: Colors.white,
                 shape: RoundedRectangleBorder(
@@ -314,48 +276,7 @@ class ProfileScreen extends StatelessWidget {
                 elevation: 4,
                 child: Stack(
                   children: [
-                    // Main content centered
-                   /* Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CircleAvatar(
-                            radius: screenWidth * 0.1,
-                            backgroundColor: Colors.yellow[700],
-                            child: ClipOval(
-                              child: imageUrl.isNotEmpty
-                                  ? Image.network(
-                                imageUrl,
-                                width: screenWidth * 0.2,
-                                height: screenWidth * 0.2,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) =>
-                                const Icon(Icons.person, size: 40),
-                              )
-                                  : const Icon(Icons.person, size: 40),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            name,
-                            style: TextStyle(
-                              fontSize: screenWidth * 0.04,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'ID: $id',
-                            style: TextStyle(
-                              fontSize: screenWidth * 0.025,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                        ],
-                      ),
-                    ),*/
+
 
                     Padding(
                       padding: const EdgeInsets.all(16.0),
@@ -381,12 +302,30 @@ class ProfileScreen extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 8),
-                            Text(
+                           /* Text(
                               name,
                               style: TextStyle(
                                 fontSize: screenWidth * 0.04,
                                 fontWeight: FontWeight.bold,
                               ),
+                            ),*/
+                            Consumer<BusinessProvider>(
+                              builder: (context, provider, child) {
+                                return Center(
+                                  child: Container(
+
+                                    child: Text(
+                                      provider.companyController.text.isNotEmpty
+                                          ? provider.companyController.text
+                                          : "No Company Name Found",
+                                      style: TextStyle(
+                                          fontSize: screenWidth * 0.04,
+                                          fontWeight: FontWeight.bold
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
                             const SizedBox(height: 2),
                             Text(
@@ -403,13 +342,13 @@ class ProfileScreen extends StatelessWidget {
                     ),
                     // Close icon (top-right corner)
                     Positioned(
-                      top: 0,
-                      right: 0,
+                      top: 5,
+                      right: 5,
                       child: GestureDetector(
                         onTap: () => Navigator.pop(context),
                         child: Icon(
                           Icons.close,
-                          size: 20,
+                          size: 22,
                           color: Colors.black,
                         ),
                       ),
@@ -573,4 +512,5 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 }
+
 

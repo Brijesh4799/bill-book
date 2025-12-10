@@ -32,4 +32,20 @@ class BusinessRepository {
 
   }
 
+  Future<BusinessDetailsModel> getcomapnydata() async {
+    try {
+      final response = await _apiService.getApiWithToken(AppUrl.businessdetails);
+      print('response: $response');
+
+      if (response != null) {
+        return BusinessDetailsModel.fromJson(response);
+      } else {
+        throw Exception('Failed to load Cart data: response is null');
+      }
+    } catch (e) {
+      print('Error fetching Cart data: $e');
+      rethrow;
+    }
+  }
+
 }

@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
+import 'package:path_provider/path_provider.dart';
 import '../get_by_id_model/car_condition_get_by_id.dart';
 import '../model/car_condition_pdf_model.dart';
 import '../repo/car_condition_pdf_repository.dart';
@@ -40,8 +43,8 @@ class CarConditionPdfProvider with ChangeNotifier {
 
   final CarConditionPdfRepository _carConditionPdfRepository = CarConditionPdfRepository();
 
-  CarConditionPdfModel? _carCondition;
-  CarConditionPdfModel? get carConditionlist => _carCondition;
+  CarConditionPdfModel? carConditionlist;
+  // CarConditionPdfModel? get carConditionlist => _carCondition;
   CarConditionGetDataModel? carConditionGetDataModel;
 
   bool _isLoading = false;
@@ -50,20 +53,83 @@ class CarConditionPdfProvider with ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-  Future<void> carconditionData() async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
+  bool isSuccess = false;
 
-    try {
-      _carCondition = await _carConditionPdfRepository.getcarconditiondataApi();
-    } catch (e) {
-      _errorMessage = 'Failed to load survey list: ${e.toString()}';
-    } finally {
-      _isLoading = false;
+
+  bool isLoading2 = false;
+
+  bool loading = false;
+  bool isLoadMoreRunning = false;
+  bool hasNextPage = true;
+
+  int page = 1;
+  void setLoading(bool loader) {
+    loading = loader;
+    notifyListeners();
+  }
+
+  Future<void> carconditionData({bool isLoadMore = false}) async {
+    if (!isLoadMore) {
+      /// FIRST PAGE CALL
+      page = 1;
+      hasNextPage = true;
+      carConditionlist = null;
+      setLoading(true);
+    } else {
+      /// LOAD MORE CALL
+      if (isLoadMoreRunning || !hasNextPage) return;
+      isLoadMoreRunning = true;
       notifyListeners();
     }
+
+    try {
+      final response = await _carConditionPdfRepository.getcarconditiondataApi(pageCount: page);
+
+      if (response.status == true &&
+          response.data != null &&
+          response.data!.isNotEmpty) {
+
+        if (isLoadMore) {
+          /// APPEND NEW DATA
+          carConditionlist!.data!.addAll(response.data!);
+        } else {
+          /// FIRST PAGE ASSIGNMENT
+          carConditionlist = response;
+        }
+
+        page++; // increase only after success
+      } else {
+        hasNextPage = false;
+      }
+    } catch (e) {
+      print("Pagination Error: $e");
+      hasNextPage = false;
+    } finally {
+      if (!isLoadMore) {
+        setLoading(false);
+      } else {
+        isLoadMoreRunning = false;
+        notifyListeners();
+      }
+    }
   }
+
+
+  // Future<void> carconditionData() async {
+  //   _isLoading = true;
+  //   _errorMessage = null;
+  //   notifyListeners();
+  //
+  //   try {
+  //     _carCondition = await _carConditionPdfRepository.getcarconditiondataApi();
+  //   } catch (e) {
+  //     _errorMessage = 'Failed to load survey list: ${e.toString()}';
+  //   } finally {
+  //     _isLoading = false;
+  //     notifyListeners();
+  //   }
+  // }
+
 
   Future<bool> deletecarcondition(String id) async {
     try {
@@ -125,7 +191,7 @@ class CarConditionPdfProvider with ChangeNotifier {
         }
       };
 
-      _carCondition = await _carConditionPdfRepository.patchcarByIdApi(id, updateData);
+      carConditionlist = await _carConditionPdfRepository.patchcarByIdApi(id, updateData);
 
       _isLoading = false;
       notifyListeners();
@@ -198,17 +264,47 @@ class CarConditionPdfProvider with ChangeNotifier {
           scratchesController.text = customer5.scratches ?? "";
           dentController.text = customer5.dent ?? "";
           otherVisibleObservationController.text = customer5.anyOtherVisibleObservation ?? "";
-
-
-
-
         }
-
-
       }
     } catch (e) {
       _errorMessage = 'Failed to load packing data: ${e.toString()}';
       print(_errorMessage);
     }
   }
+
+  String? pdfLocalPath;
+  bool pdfLoading = false;
+  String? _errorMessage2;
+
+  String? get errorMessage2 => _errorMessage2;
+
+  Future<void> fetchbillPdf(String id) async {
+    pdfLoading = true;
+    _errorMessage2 = null;
+    notifyListeners();
+
+    try {
+      final responseBytes = await  _carConditionPdfRepository.carpdfApi(id);
+
+      if (responseBytes != null) {
+        // Save PDF in temporary directory
+        final dir = await getTemporaryDirectory();
+        final file = File('${dir.path}/bill_$id.pdf');
+        await file.writeAsBytes(responseBytes);
+
+        pdfLocalPath = file.path;
+        print("✅ PDF saved at: $pdfLocalPath");
+      } else {
+        _errorMessage2 = "Empty PDF response";
+      }
+    } catch (e) {
+      _errorMessage2 = "Failed to fetch PDF: $e";
+      print(_errorMessage2);
+    } finally {
+      pdfLoading = false;
+      notifyListeners();
+    }
+  }
+
+
 }

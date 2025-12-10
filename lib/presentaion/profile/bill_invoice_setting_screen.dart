@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/widgets/custom_app_bar/ui/customAppBar.dart';
+import '../tearms and condition/quotation_tearms_condition/ui/bill_tearms_condition.dart';
 import '../tearms and condition/quotation_tearms_condition/ui/quotation_tearms_condition.dart';
 
 class BillInvoiceSettingScreen extends StatelessWidget {
@@ -64,7 +65,7 @@ class BillInvoiceSettingScreen extends StatelessWidget {
   void termAndCondition(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => QuotationTearmsCondition()),
+      MaterialPageRoute(builder: (context) => BillTearmsConditionScreen()),
     );
   }
 }

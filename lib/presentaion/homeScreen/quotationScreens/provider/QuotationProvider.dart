@@ -18,6 +18,7 @@ class QuatationProvider with ChangeNotifier {
   TextEditingController packingDateController = TextEditingController();
   TextEditingController shiftingDateController = TextEditingController();
   TextEditingController movingtypecontrooler = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
 
   TextEditingController moveFromCountryController = TextEditingController();
   TextEditingController moveFromStateController = TextEditingController();
@@ -50,6 +51,10 @@ class QuatationProvider with ChangeNotifier {
   TextEditingController octrioTaxController = TextEditingController();
   TextEditingController paymentRemarkController = TextEditingController();
   TextEditingController discountController = TextEditingController();
+  TextEditingController gtspershowingcontolller = TextEditingController();
+  TextEditingController gsttypecontroller = TextEditingController();
+  TextEditingController surchargeController = TextEditingController();
+  TextEditingController surchargeController2 = TextEditingController();
 
   TextEditingController declarationVehicleValueController = TextEditingController();
   TextEditingController vehicleDeclarationValueController = TextEditingController();
@@ -144,6 +149,7 @@ class QuatationProvider with ChangeNotifier {
             "email": emailController.text.trim(),
             "qtdate": quotationDateController.text.trim(),
             "shiptdate": shiftingDateController.text.trim(),
+            "phone": phoneController.text.trim(),
           },
           "moveFrom": {
             "fromcountry": moveFromCountryController.text.trim(),
@@ -179,8 +185,12 @@ class QuatationProvider with ChangeNotifier {
             "othercharge": otherChargesController.text.trim(),
             "stcharge": stChargeController.text.trim(),
             "octriogreentax": octrioTaxController.text.trim(),
+            "surcharge": surchargeController.text.trim(),
+            "surchargevalue": surchargeController2.text.trim(),
             "remark": paymentRemarkController.text.trim(),
             "discount": discountController.text.trim(),
+            "gstPercent": gtspershowingcontolller.text.trim(),
+            "gsttype": gsttypecontroller.text.trim(),
 
           },
           "insurance": {
@@ -219,6 +229,7 @@ class QuatationProvider with ChangeNotifier {
           partyNameController.clear();
           emailController.clear();
           quotationDateController.clear();
+          phoneController.clear();
           shiftingDateController.clear();
 
           // Move From
@@ -255,6 +266,8 @@ class QuatationProvider with ChangeNotifier {
           octrioTaxController.clear();
           paymentRemarkController.clear();
           discountController.clear();
+          gtspershowingcontolller.clear();
+          gsttypecontroller.clear();
 
           // Insurance
           insurancetypecontroller.clear();
@@ -279,6 +292,7 @@ class QuatationProvider with ChangeNotifier {
         }
 
         clearItemsAndControllers();
+        clearFormData();
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Quotation added successfully!")),
@@ -354,6 +368,11 @@ class QuatationProvider with ChangeNotifier {
     packingMaterialChargeOption = val;
     notifyListeners();
   }
+  String? selectedGstPercent;
+  void setGstPercent(String? value) {
+    selectedGstPercent = value;
+    notifyListeners();
+  }
 
   // --- Validation functions ---
   String? validateMovingType(String? value) {
@@ -369,11 +388,36 @@ class QuatationProvider with ChangeNotifier {
     }
     return null;
   }
-
+  String? selectedGstType;
+  void setGstType(String? value) {
+    selectedGstType = value;
+    notifyListeners();
+  }
+  String? selectedInsuranceChargeValue;
+  void setInsuranceChargeValue(String? value) {
+    selectedInsuranceChargeValue = value;
+    notifyListeners();
+  }
+  String? selectedInsuranceFOVGst;
+  void setInsuranceFOVGst(String? value) {
+    selectedInsuranceFOVGst = value;
+    notifyListeners();
+  }
+  String? selectedVehicleInsuranceType;
+  void setVehicleInsuranceType(String? value) {
+    selectedVehicleInsuranceType = value;
+    notifyListeners();
+  }
+  String? selectedVehicleInsuranceCharge;
+  void setVehicleInsuranceCharge(String? value) {
+    selectedVehicleInsuranceCharge = value;
+    notifyListeners();
+  }
   // --- Dispose ---
   void disposeControllers() {
     packingChargeController.dispose();
   }
+
 }
 
 

@@ -1,208 +1,19 @@
-/*
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-
-import '../../../../core/widgets/custom_Textbutton.dart';
-import '../../../../core/widgets/custom_app_bar/ui/customAppBar.dart';
-import '../../../../core/widgets/custom_input_text_field.dart';
-import '../model/money_reports_download.dart';
-import '../repo/money_report_repogistory.dart';
-
-class MoneyRepotsDownload extends StatefulWidget {
-  const MoneyRepotsDownload({super.key});
-
-  @override
-  State<MoneyRepotsDownload> createState() => _MoneyRepotsDownloadState();
-}
-
-class _MoneyRepotsDownloadState extends State<MoneyRepotsDownload> {
-  final TextEditingController startDateController = TextEditingController();
-  final TextEditingController endDateController = TextEditingController();
-
-  final MoneyReportRepogistory _repo = MoneyReportRepogistory();
-  List<Data> reportData = [];
-
-  Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2100),
-    );
-    if (picked != null) {
-      controller.text = DateFormat('yyyy-MM-dd').format(picked);
-    }
-  }
-
-  void _downloadReport() async {
-    String startDate = startDateController.text.trim();
-    String endDate = endDateController.text.trim();
-
-    if (startDate.isEmpty || endDate.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please select both start and end date')),
-      );
-      return;
-    }
-
-    try {
-      final report = await _repo.getmoneydataApi(startDate, endDate);
-      setState(() {
-        reportData = report.data ?? [];
-      });
-      print("Downloaded report: ${report.toJson()}");
-    } catch (e) {
-      print('Error downloading report: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to download report')),
-      );
-    }
-  }
-
-  Widget _buildReportCard(Data item) {
-    final form = item.formData;
-
-    return
-     */
-/* Card(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      elevation: 3,
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Receipt No: ${form?.receiptNumber ?? 'N/A'}", style: TextStyle(fontWeight: FontWeight.bold)),
-            SizedBox(height: 6),
-            Text("Receipt Date: ${form?.receiptDate ?? 'N/A'}"),
-            Text("Name: ${form?.name ?? 'N/A'}"),
-            Text("Phone: ${form?.phone ?? 'N/A'}"),
-            Text("Receipt Against: ${form?.receiptAgainst ?? 'N/A'}"),
-            Text("Bill Number: ${form?.billNumber ?? 'N/A'}"),
-            Text("Bill Date: ${form?.billDate ?? 'N/A'}"),
-            Text("Move From: ${form?.moveFrom ?? 'N/A'}"),
-            Text("Move To: ${form?.moveTo ?? 'N/A'}"),
-            Text("Payment Type: ${form?.paymentType ?? 'N/A'}"),
-            Text("Receipt Amount: ${form?.receiptAmount ?? 'N/A'}"),
-            Text("Payment Mode: ${form?.paymentMode ?? 'N/A'}"),
-            Text("Transaction No: ${form?.transactionNumber ?? 'N/A'}"),
-            Text("Branch: ${form?.branch ?? 'N/A'}"),
-            Text("Remark: ${form?.remark ?? 'N/A'}"),
-            Divider(),
-            Text("Created At: ${item.createdAt ?? 'N/A'}"),
-            Text("Updated At: ${item.updatedAt ?? 'N/A'}"),
-            Text("Status: ${item.status ?? 'N/A'}"),
-          ],
-        ),
-      ),
-    );*//*
-
-    Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Colors.black,
-          width: 1,
-        ),
-      ),
-      child: Column(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              color: Color(0xFF137DC7),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
-            ),
-            height: 40,
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Row(
-              children: [
-                Text('${index + 1}', style: const TextStyle(color: Colors.white,fontSize: 14,fontWeight: FontWeight.bold)),
-                const Spacer(),
-                Text('MONEY RECEIPT: ${index + 1}', style: const TextStyle(color: Colors.white,fontSize: 14,fontWeight: FontWeight.bold)),
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(title: 'Money Receipt Reports'),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(16.0),
-          color: Colors.white,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Download', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              SizedBox(height: 15),
-              Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => _selectDate(context, startDateController),
-                      child: AbsorbPointer(
-                        child: inputTextFields(
-                          label: 'Start Date',
-                          textEditingController: startDateController,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => _selectDate(context, endDateController),
-                      child: AbsorbPointer(
-                        child: inputTextFields(
-                          label: 'End Date',
-                          textEditingController: endDateController,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 20),
-              CustomButton(label: 'Download Reports', onPressed: _downloadReport),
-              SizedBox(height: 20),
-              reportData.isNotEmpty
-                  ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: reportData.map(_buildReportCard).toList(),
-              )
-                  : Text('No data found. Please try different dates.',
-                  style: TextStyle(color: Colors.grey)),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-*/
-
-
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-
+import 'package:share_plus/share_plus.dart';
 import '../../../../core/widgets/custom_Textbutton.dart';
 import '../../../../core/widgets/custom_app_bar/ui/customAppBar.dart';
 import '../../../../core/widgets/custom_input_text_field.dart';
 import '../../../../core/widgets/custom_more_horiz_scroll_page.dart';
 import '../../../homescreen_documents_pdf/money_receipt_pdf/money_edit_screen/money_edit_screen.dart';
+import '../../../homescreen_documents_pdf/money_receipt_pdf/money_receipt_pdf_screen/download_money_pdf.dart';
 import '../../../homescreen_documents_pdf/money_receipt_pdf/money_receipt_pdf_screen/money_receipt_pdf_screen.dart';
+import '../../../homescreen_documents_pdf/money_receipt_pdf/money_receipt_pdf_screen/share_money_pdf.dart';
 import '../../../homescreen_documents_pdf/money_receipt_pdf/provider/money_receipt_pdf_provider.dart';
-import '../../../homescreen_documents_pdf/survey_pdf/servey_pdf_share/servey_pdf_share.dart';
+import '../../../homescreen_documents_pdf/quotation_pdf/provider/quotation_pdf_provider.dart';
+import '../../../homescreen_documents_pdf/quotation_pdf/quotation_webview_pdf/loding_page.dart';
+import '../../../homescreen_documents_pdf/quotation_pdf/subscription_pdf/subscription_pdf_provider.dart';
 import '../model/money_reports_download.dart';
 import '../repo/money_report_repogistory.dart';
 
@@ -219,7 +30,6 @@ class _MoneyRepotsDownloadState extends State<MoneyRepotsDownload> {
 
   final MoneyReportRepogistory _repo = MoneyReportRepogistory();
   List<Data> reportData = [];
-
   Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -235,14 +45,12 @@ class _MoneyRepotsDownloadState extends State<MoneyRepotsDownload> {
   void _downloadReport() async {
     String startDate = startDateController.text.trim();
     String endDate = endDateController.text.trim();
-
     if (startDate.isEmpty || endDate.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select both start and end date')),
       );
       return;
     }
-
     try {
       final report = await _repo.getmoneydataApi(startDate, endDate);
       setState(() {
@@ -257,10 +65,7 @@ class _MoneyRepotsDownloadState extends State<MoneyRepotsDownload> {
     }
   }
   bool isLoading = false;
-  // FIX: Added index parameter
   Widget _buildReportCard(Data item, int index) {
-    final form = item.formData;
-
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       decoration: BoxDecoration(
@@ -415,8 +220,6 @@ class _MoneyRepotsDownloadState extends State<MoneyRepotsDownload> {
             ),
           ),
           const SizedBox(height: 10),
-
-
           ExpansionTileWrapper(
             title: 'Money',
             child: Column(
@@ -443,12 +246,10 @@ class _MoneyRepotsDownloadState extends State<MoneyRepotsDownload> {
                               ],
                             ),
                           );
-
                           if (confirm == true) {
                             final success = await Provider.of<MoneyReceiptPdfProvider>(context, listen: false)
                                 .deletemoney(item.sId ?? '');
                             print(item.sId);
-
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(success ? 'Money deleted successfully' : 'Money deleted successfully${item.sId}'),
@@ -471,7 +272,6 @@ class _MoneyRepotsDownloadState extends State<MoneyRepotsDownload> {
                               ),
                             ],
                           ),
-
                           child:
                           Row(
                             children: [
@@ -481,9 +281,7 @@ class _MoneyRepotsDownloadState extends State<MoneyRepotsDownload> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text('Delete Money', style: TextStyle(fontWeight: FontWeight.bold,fontSize: 12)),
-                                  //Text('भुगतान हटाएं',style: TextStyle(fontSize: 12),),
                                   Text('पैसे हटाएं',style: TextStyle(fontSize: 12),),
-
                                 ],
                               ),
                             ],
@@ -491,22 +289,19 @@ class _MoneyRepotsDownloadState extends State<MoneyRepotsDownload> {
                         ),
                       ),
                     ),
-
                     Expanded(
                       child: InkWell(
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              // builder: (context) => SurveyPdfWebViewScreen(id: yourIdHere), // Replace with actual ID
-                              builder: (context) => MoneyReceiptPdfWebViewScreen(id: item.sId ?? ''),
-
+                              builder: (context) => MoneyPdfWebViewScreen(id: item.sId ?? ''),
                             ),
                           );
                         },
                         child: Container(
                           padding: EdgeInsets.all(5),
-                          margin: EdgeInsets.only(left: 4), // spacing between two containers
+                          margin: EdgeInsets.only(left: 4),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(10),
@@ -541,13 +336,30 @@ class _MoneyRepotsDownloadState extends State<MoneyRepotsDownload> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // First Container
                     Expanded(
                       child: InkWell(
-                        onTap: () {
-                          PdfDownloadershare.downloadAndSharePdf(
-                            "http://167.71.232.245:8970/api/user/quotation/${item.sId}/pdf",
-                          );
+                        onTap: () async {
+                          if (item.sId != null) {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) => LoadingDialog(),
+                            );
+                            final provider =
+                            Provider.of<QuatationPdfProvider>(context, listen: false);
+                            await provider.fetchQuotationSignature(item.sId!, "moneyReceipt");
+                            if (provider.signatureLink != null) {
+                              final link = provider.signatureLink!;
+                              await Share.share(
+                                "Here is the customer signature PDF link:\n$link",
+                                subject: "Customer Signature PDF",
+                              );
+                            } else {
+                              print(" Signature link is null");
+                            }
+                          } else {
+                            print(" item.sId is null");
+                          }
                         },
                         child: Container(
                           padding: EdgeInsets.all(5),
@@ -571,14 +383,20 @@ class _MoneyRepotsDownloadState extends State<MoneyRepotsDownload> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  //Text('Customer Signature',
-                                  Text('Customer Sign..',
-                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                                    overflow: TextOverflow.ellipsis,  // show ...
-                                    maxLines: 2,                      // single line only
+                                  Text(
+                                    'Customer Sign..',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
                                     softWrap: true,
                                   ),
-                                  Text('ग्राहक के हस्ताक्षर', style: TextStyle(fontSize: 12)),
+                                  Text(
+                                    'ग्राहक के हस्ताक्षर',
+                                    style: TextStyle(fontSize: 12),
+                                  ),
                                 ],
                               ),
                             ],
@@ -586,59 +404,38 @@ class _MoneyRepotsDownloadState extends State<MoneyRepotsDownload> {
                         ),
                       ),
                     ),
-
-                   /* Expanded(
-                      child: InkWell(
-                        onTap: () {
-                          PdfDownloadershare.downloadAndSharePdf(
-                            "http://167.71.232.245:8970/api/user/money/${item.sId}/pdf",
-                          );
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(5),
-                          margin: EdgeInsets.only(left: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black26,
-                                blurRadius: 6,
-                                spreadRadius: 2,
-                                offset: Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.picture_as_pdf, color: Colors.black),
-                              SizedBox(width: 5),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Share Money Pdf',
-                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                                  Text('पैसे पीडीएफ भेजें', style: TextStyle(fontSize: 12)),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),*/
                     Expanded(
                       child: InkWell(
-                        onTap: isLoading
-                            ? null
-                            : () async {
-                          setState(() => isLoading = true);
-
-                          final url =
-                              "http://167.71.232.245:8970/api/user/money/${item.sId}/pdf";
-
-                          await PdfDownloadershare.downloadAndSharePdf(url);
-
-                          setState(() => isLoading = false);
+                        onTap: () async {
+                          if (item.sId != null) {
+                            final subscriptionProvider =
+                            Provider.of<SubscriptionPdfProvider>(context, listen: false);
+                            if (!subscriptionProvider.isSubscribed) {
+                              showDialog(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: const Text("Subscription Required"),
+                                  content: const Text(
+                                      "You are not subscribed. Please subscribe to share PDFs."),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.of(ctx).pop(),
+                                      child: const Text("OK"),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              return;
+                            }
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) => LoadingDialog(),
+                            );
+                            await PdfDownloadersharemoney.downloadAndSharePdf(item.sId!);
+                          } else {
+                            print(" item.sId is null");
+                          }
                         },
                         child: Container(
                           padding: const EdgeInsets.all(5),
@@ -669,7 +466,7 @@ class _MoneyRepotsDownloadState extends State<MoneyRepotsDownload> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: const [
                                   Text(
-                                    'Share Money Pdf',
+                                    'Share money Pdf',
                                     style:
                                     TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                                   ),
@@ -690,72 +487,11 @@ class _MoneyRepotsDownloadState extends State<MoneyRepotsDownload> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-
-
-                    /* Expanded(
-                                child: GestureDetector(
-                                  onTap: () async {
-                                    final String userId = item.userId ?? "";
-
-                                    if (userId.isEmpty) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text("Invalid User ID")),
-                                      );
-                                      return;
-                                    }
-
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => MoneyReceiptEditScreen(
-                                          id: userId, // send the userId to the edit screen
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.all(5),
-                                    margin: const EdgeInsets.only(right: 4),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(10),
-                                      boxShadow: const [
-                                        BoxShadow(
-                                          color: Colors.black26,
-                                          blurRadius: 6,
-                                          spreadRadius: 2,
-                                          offset: Offset(0, 3),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        const Icon(Icons.edit_calendar, color: Colors.black),
-                                        const SizedBox(width: 5),
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: const [
-                                            Text(
-                                              'Edit Money',
-                                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                                            ),
-                                            Text(
-                                              'पैसे में संशोधन करे',
-                                              style: TextStyle(fontSize: 12),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),*/
                     Expanded(
                       child: GestureDetector(
                         onTap: () async {
                           final String userId = item.sId ?? "";
                           print("userId");
-
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -802,14 +538,38 @@ class _MoneyRepotsDownloadState extends State<MoneyRepotsDownload> {
                         ),
                       ),
                     ),
-
-
                     Expanded(
                       child: InkWell(
-                        onTap: () {
-                          PdfDownloader.downloadAndOpenPdf(
-                            "http://167.71.232.245:8970/api/user/money/${item.sId}/pdf",
-                          );
+                        onTap: () async {
+                          if (item.sId != null) {
+                            final subscriptionProvider =
+                            Provider.of<SubscriptionPdfProvider>(context, listen: false);
+                            if (!subscriptionProvider.isSubscribed) {
+                              showDialog(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: const Text("Subscription Required"),
+                                  content: const Text(
+                                      "You are not subscribed. Please subscribe to download PDFs."),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.of(ctx).pop(),
+                                      child: const Text("OK"),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              return;
+                            }
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) => LoadingDialog(),
+                            );
+                            await PdfDownloadermoney.downloadAndOpenPdf(item.sId!);
+                          } else {
+                            print("❌ item.sId is null");
+                          }
                         },
                         child: Container(
                           padding: EdgeInsets.all(5),
@@ -847,41 +607,16 @@ class _MoneyRepotsDownloadState extends State<MoneyRepotsDownload> {
                           ),
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ],
             ),
           ),
-        /*  Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Receipt No: ${form?.receiptNumber ?? 'N/A'}",
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-                Text("Receipt Date: ${form?.receiptDate ?? 'N/A'}"),
-                Text("Name: ${form?.name ?? 'N/A'}"),
-                Text("Phone: ${form?.phone ?? 'N/A'}"),
-                Text("Receipt Against: ${form?.receiptAgainst ?? 'N/A'}"),
-                Text("Bill Number: ${form?.billNumber ?? 'N/A'}"),
-                Text("Bill Date: ${form?.billDate ?? 'N/A'}"),
-                Text("Move From: ${form?.moveFrom ?? 'N/A'}"),
-                Text("Move To: ${form?.moveTo ?? 'N/A'}"),
-                Text("Payment Type: ${form?.paymentType ?? 'N/A'}"),
-                Text("Receipt Amount: ${form?.receiptAmount ?? 'N/A'}"),
-                Text("Payment Mode: ${form?.paymentMode ?? 'N/A'}"),
-                Text("Transaction No: ${form?.transactionNumber ?? 'N/A'}"),
-                Text("Branch: ${form?.branch ?? 'N/A'}"),
-                Text("Remark: ${form?.remark ?? 'N/A'}"),
-              ],
-            ),
-          ),*/
         ],
       ),
     );
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -1,10 +1,7 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/utils/helperFuntions.dart';
 import '../../../../core/widgets/custom_app_bar/ui/customAppBar.dart';
-import '../../../../core/widgets/custom_Textbutton.dart';
 import '../../../../core/widgets/custom_checkBox.dart';
 import '../../../../core/widgets/custom_dropDown.dart';
 import '../../../../core/widgets/custom_dropDownWithInputText.dart';
@@ -14,16 +11,12 @@ import '../provider/proformaProvider.dart';
 
 class ProformaInvoiceScreen extends StatefulWidget {
   final String mobileNumber;
-  //const ProformaInvoiceScreen({super.key});
   const ProformaInvoiceScreen({Key? key, required this.mobileNumber}) : super(key: key);
-
   @override
   _proformaInvoiceScreen createState() => _proformaInvoiceScreen();
 }
 
 class _proformaInvoiceScreen extends State<ProformaInvoiceScreen> {
-  //pre invoice detail
-
   final TextEditingController preInvoiceNumberController =
       TextEditingController(text: '0001');
   final TextEditingController companyNameController = TextEditingController();
@@ -37,8 +30,6 @@ class _proformaInvoiceScreen extends State<ProformaInvoiceScreen> {
   final TextEditingController moveFromController = TextEditingController();
   final TextEditingController moveToController = TextEditingController();
   final TextEditingController vehicleNumberController = TextEditingController();
-
-  // Text controllers for consignee details
   final TextEditingController consigneeNameController = TextEditingController();
   final TextEditingController consigneePhoneController =
       TextEditingController();
@@ -54,7 +45,6 @@ class _proformaInvoiceScreen extends State<ProformaInvoiceScreen> {
   final TextEditingController consigneeAddressController =
       TextEditingController();
 
-  // Charge option dropdowns
   String? packingChargeOption;
   String? unpackingChargeOption;
   String? loadingChargeOption;
@@ -68,7 +58,7 @@ class _proformaInvoiceScreen extends State<ProformaInvoiceScreen> {
   String? reverseChargeOption;
   String? gstPaidByOption;
 
-  // Text controllers
+
   final TextEditingController freightChargeController = TextEditingController();
   final TextEditingController advancePaidController = TextEditingController();
   final TextEditingController packingChargeController = TextEditingController();
@@ -88,8 +78,10 @@ class _proformaInvoiceScreen extends State<ProformaInvoiceScreen> {
   final TextEditingController surchargeController = TextEditingController();
   final TextEditingController paymentRemarkController = TextEditingController();
   final TextEditingController discountController = TextEditingController();
+   TextEditingController gstPercentageController = TextEditingController();
+   TextEditingController reverseChargeController = TextEditingController();
+   TextEditingController gstPaidByController = TextEditingController();
 
-  // Dropdown option lists
   final List<String> chargeOptions = [
     'Included in Freight',
     'Excluded',
@@ -114,7 +106,6 @@ class _proformaInvoiceScreen extends State<ProformaInvoiceScreen> {
     'N/A'
   ];
 
-  // Text controllers for billing details
   final TextEditingController billToNameController = TextEditingController();
   final TextEditingController billToPhoneController = TextEditingController();
   final TextEditingController billToGstinController = TextEditingController();
@@ -156,11 +147,11 @@ class _proformaInvoiceScreen extends State<ProformaInvoiceScreen> {
   final TextEditingController consignorCityController = TextEditingController();
   final TextEditingController consignorPincodeController = TextEditingController();
   final TextEditingController consignorAddressController = TextEditingController();
+   TextEditingController gstTypeController = TextEditingController();
 
 // Checkbox state for "Same as Billing"
   bool isConsignorSameAsBilling = true;
 
-  void _SaveAllValues() {}
 
   @override
   Widget build(BuildContext context) {
@@ -193,29 +184,24 @@ class _proformaInvoiceScreen extends State<ProformaInvoiceScreen> {
                   onPressed: () async {
                     HelperFunctions helper = HelperFunctions();
                     bool isConnected = await helper.isConnected();
-
                     if (!isConnected) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('No internet connection')),
                       );
                       return;
                     }
-
-                    // Call the provider's method
                     await provider.proformainvoice(
                       mobileNumber: widget.mobileNumber,
                       context: context,
                     );
-
-                    // Navigate to Home Page
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => HomeNavController()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 50), // Full width button
-                    backgroundColor: Colors.blue, // Customize as needed
+                    minimumSize: Size(double.infinity, 50),
+                    backgroundColor: Colors.blue,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -247,10 +233,6 @@ class _proformaInvoiceScreen extends State<ProformaInvoiceScreen> {
                 label: 'COMPANY NAME OF PARTY (कंपनी नाम - जिसे कोटेशन चाहिए)',
                 textEditingController: provider.companyNameController,
               ),
-              // inputTextFields(
-              //   label: 'LR NUMBER (बिल्टी नंबर)',
-              //   textEditingController: lrNumberController,
-              // ),
               Row(
                 children: [
                   Expanded(
@@ -312,19 +294,22 @@ class _proformaInvoiceScreen extends State<ProformaInvoiceScreen> {
                       label: 'GST SHOW/HIDE GST',
                       items: movingPathOption,
                       selectedItem: movingPath,
+                      controller: provider.gstShowHideController,
                       onChanged: (value) {
                         setState(() {
                           movingPath = value;
                         });
+                        provider.gstShowHideController.text = value ?? '';
                       },
                       val: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please select an option';
                         }
                         return null;
-                      }, controller: null,
+                      },
                     ),
                   ),
+
                   SizedBox(width: 10),
                   Expanded(
                     child: inputTextFields(
@@ -440,7 +425,6 @@ class _proformaInvoiceScreen extends State<ProformaInvoiceScreen> {
                   });
                 },
               ),
-
               if (!isConsignorSameAsBilling) ...[
                 inputTextFields(
                     label: 'CONSIGNOR NAME (भेजने वाले का नाम)',
@@ -572,24 +556,17 @@ class _proformaInvoiceScreen extends State<ProformaInvoiceScreen> {
                 label: 'DESCRIPTION (पैकेज का विवरण)',
                 textEditingController: provider.descriptionController,
               ),
-
-              Consumer<ProformaInvoiceProvider>(
-                builder: (context, provider, child) {
-                  return DropdownWithInputField(
-                    dropdownValue: provider.totalWeightUnit,
-                    onDropdownChanged: (val) {
-                      provider.setTotalWeightUnit(val);
-                    },
-                    dropdownItems: ['KG', 'Ton', 'Gram'],
-                    controller: provider.totalWeightController,
-                    hintText: 'Enter Value',
-                    dropDownhint: 'Select Unit',
-                    labelText: 'TOTAL WEIGHT (कुल वजन)',
-                  );
+              DropdownWithInputField(
+                dropdownValue: provider.totalWeightUnit,
+                onDropdownChanged: (val) {
+                  provider.setTotalWeightUnit(val);
                 },
+                dropdownItems: ['KG', 'Ton', 'Gram'],
+                controller: provider.totalWeightController,
+                hintText: 'Enter Value',
+                dropDownhint: 'Select Unit',
+                labelText: 'TOTAL WEIGHT (कुल वजन)',
               ),
-
-
               inputTextFields(
                 label: 'HSN/SAC CODE',
                 textEditingController: provider.receiveConditionController,
@@ -624,85 +601,81 @@ class _proformaInvoiceScreen extends State<ProformaInvoiceScreen> {
                 hintText: '0',
                 textEditingController: provider.advancePaidController,
               ),
-
-              Consumer<ProformaInvoiceProvider>(
-                builder: (context, provider, child) {
-                  return DropdownWithInputField(
-                    dropdownValue: provider.packingChargeOption,
-                    onDropdownChanged: (val) {
-                      provider.setPackingChargeOption(val);
-                    },
-                    dropdownItems: chargeOptions,
-                    controller: provider.packingChargeController,
-                    hintText: '0',
-                    labelText: 'PACKING CHARGE',
-                  );
+              DropdownWithInputField(
+                dropdownValue: provider.packingChargeOption,
+                onDropdownChanged: (val) {
+                  provider.setPackingChargeOption(val);
+                  if (val == "Excluded") {
+                    provider.packingChargeController.clear();
+                  } else {
+                    provider.packingChargeController.text = val ?? '';
+                  }
                 },
+                dropdownItems: chargeOptions,
+                controller: provider.packingChargeController,
+                hintText: 'Enter value',
+                labelText: 'PACKING CHARGE',
               ),
-
-
-
-              Consumer<ProformaInvoiceProvider>(
-                builder: (context, provider, child) {
-                  return DropdownWithInputField(
-                    dropdownValue: provider.unpackingChargeOption,
-                    onDropdownChanged: (val) {
-                      provider.setUnpackingChargeOption(val);
-                    },
-                    dropdownItems: chargeOptions,
-                    controller: provider.unpackingChargeController,
-                    hintText: '0',
-                    labelText: 'UN PACKING CHARGE',
-                  );
+              DropdownWithInputField(
+                dropdownValue: provider.unpackingChargeOption,
+                onDropdownChanged: (val) {
+                  provider.setUnpackingChargeOption(val);
+                  if (val == "Excluded") {
+                    provider.unpackingChargeController.clear();
+                  } else {
+                    provider.unpackingChargeController.text = val ?? '';
+                  }
                 },
+                dropdownItems: chargeOptions,
+                controller: provider.unpackingChargeController,
+                hintText: '0',
+                labelText: 'UN PACKING CHARGE',
               ),
-
-              Consumer<ProformaInvoiceProvider>(
-                builder: (context, provider, child) {
-                  return DropdownWithInputField(
-                    dropdownValue: provider.loadingChargeOption,
-                    onDropdownChanged: (val) {
-                      provider.setLoadingChargeOption(val);
-                    },
-                    dropdownItems: chargeOptions,
-                    controller: provider.loadingChargeController,
-                    hintText: '0',
-                    labelText: 'LOADING CHARGE',
-                  );
+             DropdownWithInputField(
+                dropdownValue: provider.loadingChargeOption,
+                onDropdownChanged: (val) {
+                  provider.setLoadingChargeOption(val);
+                  if (val == "Excluded") {
+                    provider.loadingChargeController.clear();
+                  } else {
+                    provider.loadingChargeController.text = val ?? '';
+                  }
                 },
+                dropdownItems: chargeOptions,
+                controller: provider.loadingChargeController,
+                hintText: '0',
+                labelText: 'LOADING CHARGE',
               ),
-
-              Consumer<ProformaInvoiceProvider>(
-                builder: (context, provider, child) {
-                  return DropdownWithInputField(
-                    dropdownValue: provider.unloadingChargeOption,
-                    onDropdownChanged: (val) {
-                      provider.setUnloadingChargeOption(val);
-                    },
-                    dropdownItems: chargeOptions,
-                    controller: provider.unloadingChargeController,
-                    hintText: '0',
-                    labelText: 'UN LOADING CHARGE',
-                  );
+              DropdownWithInputField(
+                dropdownValue: provider.unloadingChargeOption,
+                onDropdownChanged: (val) {
+                  provider.setUnloadingChargeOption(val);
+                  if (val == "Excluded") {
+                    provider.unloadingChargeController.clear();
+                  } else {
+                    provider.unloadingChargeController.text = val ?? '';
+                  }
                 },
+                dropdownItems: chargeOptions,
+                controller: provider.unloadingChargeController,
+                hintText: '0',
+                labelText: 'UN LOADING CHARGE',
               ),
-
-              Consumer<ProformaInvoiceProvider>(
-                builder: (context, provider, child) {
-                  return DropdownWithInputField(
-                    dropdownValue: provider.packingMaterialChargeOption,
-                    onDropdownChanged: (val) {
-                      provider.setPackingMaterialChargeOption(val);
-                    },
-                    dropdownItems: chargeOptions,
-                    controller: provider.packingMaterialChargeController,
-                    hintText: '0',
-                    labelText: 'PACKING MATERIAL CHARGE',
-                  );
+              DropdownWithInputField(
+                dropdownValue: provider.packingMaterialChargeOption,
+                onDropdownChanged: (val) {
+                  provider.setPackingMaterialChargeOption(val);
+                  if (val == "Excluded") {
+                    provider.packingMaterialChargeController.clear();
+                  } else {
+                    provider.packingMaterialChargeController.text = val ?? '';
+                  }
                 },
+                dropdownItems: chargeOptions,
+                controller: provider.packingMaterialChargeController,
+                hintText: '0',
+                labelText: 'PACKING MATERIAL CHARGE',
               ),
-
-
               Row(
                 children: [
                   Expanded(
@@ -760,41 +733,34 @@ class _proformaInvoiceScreen extends State<ProformaInvoiceScreen> {
                   ),
                 ],
               ),
-
-              Consumer<ProformaInvoiceProvider>(
-                builder: (context, provider, child) {
-                  return DropdownWithInputField(
-                    dropdownValue: provider.surchargeOption,
-                    onDropdownChanged: (val) {
-                      provider.setSurchargeOption(val);
-                    },
-                    dropdownItems: surchargeOptions,
-                    controller: provider.surchargeController,
-                    hintText: '10%',
-                    labelText: 'SURCHARGE',
-                  );
+              DropdownWithInputField(
+                dropdownValue: provider.surchargeOption,
+                onDropdownChanged: (val) {
+                  provider.setSurchargeOption(val);
+                  provider.surchargeController.text = provider.surchargeController.text;
+                },
+                dropdownItems: surchargeOptions,
+                controller: provider.surchargeController,
+                hintText: '10%',
+                labelText: 'SURCHARGE',
+              ),
+              customDropdown(
+                label: 'GST SHOW/HIDE GST',
+                items: gstShowHideOptions,
+                selectedItem: provider.gstOption,
+                controller: provider.gstShowHideController,
+                onChanged: (value) {
+                  provider.setGstOption(value);
+                  provider.gstShowHideController.text = value ?? '';
+                  print("Selected GST Option: ${provider.gstShowHideController.text}");
+                },
+                val: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select an option';
+                  }
+                  return null;
                 },
               ),
-
-              Consumer<ProformaInvoiceProvider>(
-                builder: (context, provider, child) {
-                  return customDropdown(
-                    label: 'GST SHOW/HIDE GST',
-                    items: gstShowHideOptions,
-                    selectedItem: provider.gstOption,
-                    onChanged: (value) {
-                      provider.setGstOption(value);
-                    },
-                    val: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please select an option';
-                      }
-                      return null;
-                    }, controller: null,
-                  );
-                },
-              ),
-
               Row(
                 children: [
                   Expanded(
@@ -802,9 +768,11 @@ class _proformaInvoiceScreen extends State<ProformaInvoiceScreen> {
                       label: 'GST %',
                       items: gstPercentageOptions,
                       selectedItem: gstPercentageOption,
+                      controller: provider.gstPercentageController,
                       onChanged: (value) {
                         setState(() {
                           gstPercentageOption = value;
+                          provider.gstPercentageController.text = value ?? '';
                         });
                       },
                       val: (value) {
@@ -812,18 +780,21 @@ class _proformaInvoiceScreen extends State<ProformaInvoiceScreen> {
                           return 'Please select GST %';
                         }
                         return null;
-                      }, controller: null,
+                      },
                     ),
                   ),
-                  SizedBox(width: 10),
+
+          SizedBox(width: 10),
                   Expanded(
                     child: customDropdown(
                       label: 'GST TYPE',
                       items: gstTypeOptions,
                       selectedItem: gstTypeOption,
+                      controller: provider.gstTypeController,
                       onChanged: (value) {
                         setState(() {
                           gstTypeOption = value;
+                          provider.gstTypeController.text = value ?? '';
                         });
                       },
                       val: (value) {
@@ -831,21 +802,23 @@ class _proformaInvoiceScreen extends State<ProformaInvoiceScreen> {
                           return 'Please select GST Type';
                         }
                         return null;
-                      }, controller: null,
+                      },
                     ),
                   ),
                 ],
               ),
-              Row(
+          Row(
                 children: [
                   Expanded(
                     child: customDropdown(
                       label: 'REVERSE CHARGE',
                       items: reverseChargeOptions,
                       selectedItem: reverseChargeOption,
+                      controller: provider.reverseChargeController,
                       onChanged: (value) {
                         setState(() {
                           reverseChargeOption = value;
+                          provider.reverseChargeController.text = value ?? '';
                         });
                       },
                       val: (value) {
@@ -853,7 +826,7 @@ class _proformaInvoiceScreen extends State<ProformaInvoiceScreen> {
                           return 'Please select Reverse Charge option';
                         }
                         return null;
-                      }, controller: null,
+                      },
                     ),
                   ),
                   SizedBox(width: 10),
@@ -862,9 +835,11 @@ class _proformaInvoiceScreen extends State<ProformaInvoiceScreen> {
                       label: 'GST PAID BY',
                       items: gstPaidByOptions,
                       selectedItem: gstPaidByOption,
+                      controller: gstPaidByController,
                       onChanged: (value) {
                         setState(() {
                           gstPaidByOption = value;
+                          gstPaidByController.text = value ?? '';
                         });
                       },
                       val: (value) {
@@ -872,7 +847,7 @@ class _proformaInvoiceScreen extends State<ProformaInvoiceScreen> {
                           return 'Please select who pays GST';
                         }
                         return null;
-                      }, controller: null,
+                      },
                     ),
                   ),
                 ],

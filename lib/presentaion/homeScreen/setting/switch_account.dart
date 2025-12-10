@@ -1,7 +1,6 @@
 import 'package:BillBook/core/widgets/custom_app_bar/ui/customAppBar.dart';
 import 'package:flutter/material.dart';
 import '../../../core/widgets/custom_Textbutton.dart';
-
 class SwitchAccount extends StatelessWidget {
   final List<String> accounts = [
     "Agreem Solution",
@@ -9,9 +8,7 @@ class SwitchAccount extends StatelessWidget {
     "user3@example.com",
     "user4@example.com",
   ];
-
   final String currentAccount = "Agreem Solution";
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +30,6 @@ class SwitchAccount extends StatelessWidget {
                           ? Icon(Icons.check, color: Colors.blue)
                           : null,
                       onTap: () {
-                        // Handle account switch logic here
                       },
                     ),
                   );

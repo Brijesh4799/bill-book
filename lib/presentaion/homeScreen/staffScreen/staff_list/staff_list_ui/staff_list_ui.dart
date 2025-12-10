@@ -1,124 +1,3 @@
-/*
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../../../../core/widgets/custom_app_bar/ui/customAppBar.dart';
-import '../staff_provider/staff_provider.dart';
-
-class StaffListScreen extends StatefulWidget {
-  const StaffListScreen({super.key});
-
-  @override
-  State<StaffListScreen> createState() => _StaffListScreenState();
-}
-
-class _StaffListScreenState extends State<StaffListScreen> {
-  @override
-  void initState() {
-    super.initState();
-    // Fetch staff data when screen loads
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<StaffListProvider>(context, listen: false).fetchStaffList();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final staffProvider = Provider.of<StaffListProvider>(context);
-
-    return Scaffold(
-      appBar:CustomAppBar(title: 'Staff List',),
-      body: staffProvider.loading
-          ? const Center(child: CircularProgressIndicator())
-          : staffProvider.staffList == null ||
-          staffProvider.staffList!.data == null ||
-          staffProvider.staffList!.data!.isEmpty
-          ? const Center(child: Text("No Staff Found"))
-          : Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Text(
-              "Total Staff: ${staffProvider.staffList!.data!.length}",
-              style: const TextStyle(
-                  fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ),
-
-          Expanded(
-            child: ListView.builder(
-              itemCount: staffProvider.staffList!.data!.length,
-              itemBuilder: (context, index) {
-                final staff = staffProvider.staffList!.data![index];
-                return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
-                        blurRadius: 6,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Avatar
-                      CircleAvatar(
-                        radius: 25,
-                        backgroundImage: staff.image != null
-                            ? NetworkImage(staff.image!)
-                            : null,
-                        child: staff.image == null
-                            ? const Icon(Icons.person, size: 30)
-                            : null,
-                      ),
-                      const SizedBox(width: 12),
-
-                      // Staff info in column
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              staff.name ?? "-",
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text("Email: ${staff.email ?? "-"}"),
-                            Text("Phone: ${staff.phone ?? "-"}"),
-                            Text("Address: ${staff.address ?? "-"}"),
-                          ],
-                        ),
-                      ),
-
-                      // Index count
-                      Text(
-                        "${index + 1}",
-                        style: const TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          )
-
-        ],
-      ),
-    );
-  }
-}
-
-*/
-
 
 import 'dart:io';
 
@@ -175,7 +54,7 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
       "email": emailController.text.trim(),
       "phone": phoneController.text.trim(),
       "address": addressController.text.trim(),
-      "image": selectedImage!.path, // You can upload as multipart if backend supports
+      "image": selectedImage!.path,
     };
 
     try {
@@ -199,7 +78,6 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //appBar: AppBar(title: const Text("Add New Staff")),
       appBar: CustomAppBar(title: 'Add New Staff',),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -207,7 +85,6 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
           key: _formKey,
           child: Column(
             children: [
-              // Name
               TextFormField(
                 controller: nameController,
                 decoration: const InputDecoration(labelText: "Name"),
@@ -215,7 +92,6 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
                 value!.isEmpty ? "Please enter name" : null,
               ),
               const SizedBox(height: 12),
-              // Email
               TextFormField(
                 controller: emailController,
                 decoration: const InputDecoration(labelText: "Email"),
@@ -223,7 +99,6 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
                 value!.isEmpty ? "Please enter email" : null,
               ),
               const SizedBox(height: 12),
-              // Phone
               TextFormField(
                 controller: phoneController,
                 decoration: const InputDecoration(labelText: "Phone"),
@@ -231,7 +106,6 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
                 value!.isEmpty ? "Please enter phone" : null,
               ),
               const SizedBox(height: 12),
-              // Address
               TextFormField(
                 controller: addressController,
                 decoration: const InputDecoration(labelText: "Address"),
@@ -239,7 +113,6 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
                 value!.isEmpty ? "Please enter address" : null,
               ),
               const SizedBox(height: 16),
-              // Image Picker
               GestureDetector(
                 onTap: pickImage,
                 child: Container(

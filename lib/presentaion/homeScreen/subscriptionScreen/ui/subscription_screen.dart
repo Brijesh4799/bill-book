@@ -21,6 +21,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     super.initState();
     Provider.of<SubscriptionProvider>(context, listen: false).billListData();
   }
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   final List<Map<String, String>> features = [
     {
@@ -85,112 +89,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     },
   ];
 
- /* void _showPlanDialog(sub, String planDays, String price) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Selected Plan"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Plan: $planDays"),
-            Text("Price: $price"),
-            Text("Admin Accounts: ${sub.adminAccount ?? 0}"),
-            Text("Staff Accounts: ${sub.staffAccount ?? 0}"),
-            Text("Plan ID: ${sub.sId ?? "N/A"}"), // ✅ show selected ID
-          ],
-        ),
-        actions: [
-          Row(
-            children: [
-              SizedBox(
-                height: 60,
-                child:
-                InkWell(
-                  onTap: () async {
-                    if (selectedPlan == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text(
-                                'Please select a subscription plan')),
-                      );
-                      return;
-                    }
-
-                    await provider.submitSubscription(
-                      planId: selectedPlan.sId ?? "",
-                      name: selectedPlan.name ?? "",
-                      durationDays:
-                      selectedPlan.durationDays ?? 0,
-                      price: selectedPlan.price ?? 0,
-                      adminAccount:
-                      selectedPlan.adminAccount ?? 0,
-                      staffAccount:
-                      selectedPlan.staffAccount ?? 0,
-                      startDate: DateTime.now()
-                          .toString()
-                          .split(" ")[0],
-                      endDate: DateTime.now()
-                          .add(Duration(
-                          days:
-                          selectedPlan.durationDays ?? 0))
-                          .toString()
-                          .split(" ")[0],
-                      isActive: selectedPlan.isActive ?? false,
-                      paymentStatus: "Pending",
-                    );
-
-                    if (!mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text(
-                              'Subscription submitted successfully!')),
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20),
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(8),
-                      color: provider.isLoading
-                          ? Colors.grey
-                          : Colors.blue,
-                    ),
-                    child: provider.isLoading
-                        ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      ),
-                    )
-                        : const Text(
-                      'Submit Subscription',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("OK"),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }*/
-  void _showPlanDialog(sub, String planDays, String price) {
+  void _showPlanDialog(sub, String planDays, String price,String id) {
     final provider = Provider.of<SubscriptionProvider>(context, listen: false);
-
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -244,15 +144,12 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 ),),
               ],
             ),
-
-
           ],
         ),
         actions: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Subscribe Button
               Expanded(
                 child: InkWell(
                   onTap: () async {
@@ -266,30 +163,16 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                     }
 
                     await provider.submitSubscription(
-                      planId: selectedPlan.sId ?? "",
-                      name: selectedPlan.name ?? "",
-                      durationDays: selectedPlan.durationDays ?? 0,
-                      price: selectedPlan.price ?? 0,
-                      adminAccount: selectedPlan.adminAccount ?? 0,
-                      staffAccount: selectedPlan.staffAccount ?? 0,
-                      startDate: DateTime.now().toString().split(" ")[0],
-                      endDate: DateTime.now()
-                          .add(Duration(days: selectedPlan.durationDays ?? 0))
-                          .toString()
-                          .split(" ")[0],
-                      isActive: selectedPlan.isActive ?? false,
-                      paymentStatus: "Pending",
+                      id: id,
+                   context: context
                     );
-
                     if (!mounted) return;
-
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                           content:
                           Text('Subscription submitted successfully!')),
                     );
-
-                    Navigator.pop(context); // close dialog after subscription
+                    Navigator.pop(context);
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 12),
@@ -309,7 +192,6 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                     )
                         : Text(
                       'Pay $price',
-                     // 'Subscribe',
                       style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold),
@@ -318,10 +200,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 ),
               ),
               const SizedBox(width: 10),
-              // Cancel Button
               Expanded(
                 child: TextButton(
-                  onPressed: () => Navigator.pop(context), // close dialog
+                  onPressed: () => Navigator.pop(context),
                   child: const Text(
                     'Cancel',
                     style: TextStyle(color: Colors.red),
@@ -340,9 +221,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     final provider = Provider.of<SubscriptionProvider>(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
-      appBar: CustomAppBar(title: 'Subscription'),
+      appBar: CustomAppBar(title: 'Subscription',showBackButton: false,home: false,),
       body: provider.isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
@@ -350,83 +230,6 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-          /*  Container(
-              padding: EdgeInsets.only(bottom: screenWidth * 0.03),
-              color: Colors.white,
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: screenHeight * 0.3,
-                    child: Image.asset(
-                      'assets/images/subscriptionPreImage.png',
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.02),
-                  Text(
-                    'Choose Your Subscription',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: screenWidth * 0.04,
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.02),
-
-                  // Subscription Plans
-                  ...?provider.subscriptionList?.data?.map((sub) {
-                    final int duration = sub.durationDays ?? 0;
-                    final String planDays = '$duration DAYS';
-                    final String price = '₹${sub.price}/-';
-
-                    final bool isSelected = selectedPlan == sub;
-
-                    return InkWell(
-                      onTap: () {
-                        setState(() {
-                          selectedDays = planDays;
-                          selectedPlan = sub;
-                        });
-
-                        // Show pop message (dialog)
-                        _showPlanDialog(sub, planDays, price);
-                      },
-                      child: Container(
-                        margin: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
-                        decoration: BoxDecoration(
-                          color: isSelected ? Colors.blueAccent : Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: isSelected ? Colors.blue : Colors.grey,
-                            width: 1.5,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 4,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: ListTile(
-                          title: Text(
-                            planDays,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: screenWidth * 0.04,
-                              color: isSelected ? Colors.white : Colors.black,
-                            ),
-                          ),
-                          subtitle: Text(
-                            'PAY $price',
-                            style: TextStyle(
-                              fontSize: screenWidth * 0.035,
-                              color: isSelected ? Colors.white70 : Colors.black54,
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),*/
             Container(
               padding: EdgeInsets.only(bottom: screenWidth * 0.03),
               color: Colors.white,
@@ -447,13 +250,11 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                         fontSize: screenWidth * 0.04),
                   ),
                   SizedBox(height: screenHeight * 0.02),
-
-                  // Subscription Plans
                   ...?provider.subscriptionList?.data?.map((sub) {
                     final int duration = sub.durationDays ?? 0;
                     final String planDays = '$duration DAYS';
                     final String price = '₹${sub.price}/-';
-
+                    final String id='${sub.sId}';
                     final Color cardColor = duration == 90
                         ? const Color(0xFFACD7F6)
                         : duration == 180
@@ -466,7 +267,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                           selectedDays = planDays;
                           selectedPlan = sub;
                         });
-                        _showPlanDialog(sub, planDays, price);
+                        _showPlanDialog(sub, planDays, price,id);
                       },
                       child: Container(
                         margin: EdgeInsets.symmetric(
@@ -485,7 +286,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                 selectedDays = value;
                                 selectedPlan = sub;
                               });
-                              _showPlanDialog(sub, planDays, price);
+                              _showPlanDialog(sub, planDays, price,id);
                             },
                           ),
                           title: Text(planDays,
@@ -499,10 +300,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                       ),
                     );
                   }).toList(),
-
                   SizedBox(height: screenHeight * 0.02),
-
-
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [

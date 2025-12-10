@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../get_by_id_model/fov_scf_get_byid_model.dart';
 import '../model/fov_scf_form_pdf_model.dart';
@@ -28,22 +31,71 @@ class FocScfPdfProvider with ChangeNotifier {
   String? get errorMessage => _errorMessage;
 
 
-  Future<void> focscfData() async {
-    _isLoading = true;
-    _errorMessage = null;
+  // Future<void> focscfData() async {
+  //   _isLoading = true;
+  //   _errorMessage = null;
+  //   notifyListeners();
+  //   try {
+  //     _carCondition = await _carConditionPdfRepository.getfocscfdataApi();
+  //   } catch (e) {
+  //     _errorMessage = 'Failed to load survey list: ${e.toString()}';
+  //   } finally {
+  //     _isLoading = false;
+  //     notifyListeners();
+  //   }
+  // }
+  bool isLoading2 = false;
+  bool loading = false;
+  bool isLoadMoreRunning = false;
+  bool hasNextPage = true;
+  int page = 1;
+  void setLoading(bool loader) {
+    loading = loader;
     notifyListeners();
-
-    try {
-      _carCondition = await _carConditionPdfRepository.getfocscfdataApi();
-
-
-    } catch (e) {
-      _errorMessage = 'Failed to load survey list: ${e.toString()}';
-    } finally {
-      _isLoading = false;
+  }
+  Future<void> focscfData({bool isLoadMore = false}) async {
+    if (!isLoadMore) {
+      page = 1;
+      hasNextPage = true;
+      _carCondition = null;
+      setLoading(true);
+    } else {
+      if (isLoadMoreRunning || !hasNextPage) return;
+      isLoadMoreRunning = true;
       notifyListeners();
     }
+    try {
+      final response = await _carConditionPdfRepository.getfocscfdataApi(pageCount: page);
+      if (response.status == true &&
+          response.data != null &&
+          response.data!.isNotEmpty) {
+        if (isLoadMore) {
+          _carCondition!.data!.addAll(response.data!);
+        } else {
+          _carCondition = response;
+        }
+        page++;
+      } else {
+        hasNextPage = false;
+      }
+    } catch (e) {
+      print("Pagination Error: $e");
+      hasNextPage = false;
+    } finally {
+      if (!isLoadMore) {
+        setLoading(false);
+      } else {
+        isLoadMoreRunning = false;
+        notifyListeners();
+      }
+    }
   }
+
+
+
+
+
+
   final _repo = FocScfPdfRepository();
   Future<bool> deleteFoc(String id) async {
     try {
@@ -129,17 +181,46 @@ class FocScfPdfProvider with ChangeNotifier {
           fovMoveToCityController.text = customer.moveToCity ?? "";
 
         }
-
-
-
-
-
-
       }
     } catch (e) {
       _errorMessage = 'Failed to load packing data: ${e.toString()}';
       print(_errorMessage);
     }
   }
+
+  String? pdfLocalPath;
+  bool pdfLoading = false;
+  String? _errorMessage2;
+
+  String? get errorMessage2 => _errorMessage2;
+
+  Future<void> fetchfovscfPdf(String id) async {
+    pdfLoading = true;
+    _errorMessage2 = null;
+    notifyListeners();
+
+    try {
+      final responseBytes = await  _carConditionPdfRepository.foccfpdfApi(id);
+
+      if (responseBytes != null) {
+        // Save PDF in temporary directory
+        final dir = await getTemporaryDirectory();
+        final file = File('${dir.path}/bill_$id.pdf');
+        await file.writeAsBytes(responseBytes);
+
+        pdfLocalPath = file.path;
+        print("✅ PDF saved at: $pdfLocalPath");
+      } else {
+        _errorMessage2 = "Empty PDF response";
+      }
+    } catch (e) {
+      _errorMessage2 = "Failed to fetch PDF: $e";
+      print(_errorMessage2);
+    } finally {
+      pdfLoading = false;
+      notifyListeners();
+    }
+  }
+
 
 }

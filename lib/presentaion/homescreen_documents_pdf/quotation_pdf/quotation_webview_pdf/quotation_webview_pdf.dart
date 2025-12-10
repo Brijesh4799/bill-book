@@ -1,61 +1,204 @@
+/*
+
+
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
-import 'package:http/http.dart' as http;
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
-
+import 'package:provider/provider.dart';
 import '../../../../core/widgets/custom_app_bar/ui/customAppBar.dart';
+import '../provider/quotation_pdf_provider.dart';
+
 class QuotationPdfScreen extends StatefulWidget {
   final String id;
   const QuotationPdfScreen({Key? key, required this.id}) : super(key: key);
+
   @override
   _QuotationPdfScreenState createState() => _QuotationPdfScreenState();
 }
+
 class _QuotationPdfScreenState extends State<QuotationPdfScreen> {
-  String? localPath;
+  String loadingText = "Loading PDF";
+  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
-    print(" Received quotation ID: ${widget.id}"); // Debug log
-    _downloadPdf();
+    print("📩 Received quotation ID: ${widget.id}");
+    Future.microtask(() {
+      context.read<QuatationPdfProvider>().fetchQuotationPdf(widget.id);
+    });
+    startLoadingAnimation();
   }
 
-  Future<void> _downloadPdf() async {
-    if (widget.id.isEmpty) {
-      print(" No quotation ID provided!");
-      return;
-    }
+  void startLoadingAnimation() {
+    int dotCount = 0;
+    _timer = Timer.periodic(Duration(milliseconds: 500), (timer) {
+      setState(() {
+        dotCount = (dotCount + 1) % 4;
+        loadingText = "Loading PDF" + "." * dotCount;
+      });
+    });
+  }
 
-    final url = 'http://167.71.232.245:8970/api/user/quotation/${widget.id}/pdf';
-   //final url = 'http://192.168.1.34:5050/api/user/quotation/${widget.id}/pdf';
-    print(" Downloading PDF from: $url");
-
-    try {
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        final dir = await getTemporaryDirectory();
-        final file = File('${dir.path}/quotation_${widget.id}.pdf');
-        await file.writeAsBytes(response.bodyBytes);
-        setState(() {
-          localPath = file.path;
-        });
-        print(" PDF saved at: ${file.path}");
-      } else {
-        print(" Failed to download PDF. Status code: ${response.statusCode}");
-      }
-    } catch (e) {
-      print("Error downloading PDF: $e");
-    }
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: 'Quotation PDF'),
-      body: localPath == null
-          ? const Center(child: CircularProgressIndicator())
-          : PDFView(filePath: localPath!),
+      body: Consumer<QuatationPdfProvider>(
+        builder: (context, provider, _) {
+          if (provider.pdfLoading) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 20),
+                  Text(
+                    loadingText,
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
+            );
+          } else if (provider.errorMessage != null) {
+            return Center(child: Text(provider.errorMessage!));
+          } else if (provider.pdfLocalPath != null) {
+            return PDFView(filePath: provider.pdfLocalPath!);
+          } else {
+            return Center(child: Text("No PDF available"));
+          }
+        },
+      ),
+    );
+  }
+}
+
+
+
+*/
+
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:flutter_pdfview/flutter_pdfview.dart';
+import 'package:provider/provider.dart';
+import 'package:screen_protector/screen_protector.dart';
+import '../../../../core/widgets/custom_app_bar/ui/customAppBar.dart';
+import '../provider/quotation_pdf_provider.dart';
+import '../subscription_pdf/subscription_pdf_provider.dart';
+
+class QuotationPdfScreen extends StatefulWidget {
+  final String id;
+  const QuotationPdfScreen({Key? key, required this.id}) : super(key: key);
+
+  @override
+  _QuotationPdfScreenState createState() => _QuotationPdfScreenState();
+}
+
+class _QuotationPdfScreenState extends State<QuotationPdfScreen> {
+  String loadingText = "Loading PDF";
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _startLoadingAnimation();
+
+    // Fetch subscription and handle screenshot blocking
+    Future.microtask(() async {
+      try {
+        final subscriptionProvider =
+        context.read<SubscriptionPdfProvider>();
+        await subscriptionProvider.fetchSubscriptionPdf();
+
+        final isSubscribed = subscriptionProvider.isSubscribed;
+        print('Subscription status: $isSubscribed');
+
+        if (!isSubscribed) {
+          print('Blocking screenshots because user is not subscribed');
+          try {
+            await ScreenProtector.preventScreenshotOn();
+            print('Screenshot protection enabled >>>>>>>>>>>>>>>>>>');
+          } catch (e) {
+            print("Failed to block screenshots: $e");
+          }
+        } else {
+          print('Allowing screenshots because user is subscribed');
+          try {
+            await ScreenProtector.preventScreenshotOff();
+          } catch (e) {
+            print("Failed to allow screenshots: $e");
+          }
+        }
+      } catch (e) {
+        print("Subscription check failed: $e");
+      } finally {
+        // Always fetch PDF regardless of subscription check
+        context.read<QuatationPdfProvider>().fetchQuotationPdf(widget.id);
+      }
+    });
+  }
+
+  void _startLoadingAnimation() {
+    int dotCount = 0;
+    _timer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+      setState(() {
+        dotCount = (dotCount + 1) % 4;
+        loadingText = "Loading PDF" + "." * dotCount;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+
+    // Always allow screenshots again when leaving screen
+    try {
+      ScreenProtector.preventScreenshotOff();
+    } catch (e) {
+      print("Failed to clear screenshot protection: $e");
+    }
+
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: CustomAppBar(title: 'Quotation PDF'),
+      body: Consumer<QuatationPdfProvider>(
+        builder: (context, provider, _) {
+          if (provider.pdfLoading) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 20),
+                  Text(
+                    loadingText,
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
+            );
+          } else if (provider.errorMessage != null) {
+            return Center(child: Text(provider.errorMessage!));
+          } else if (provider.pdfLocalPath != null) {
+            // PDF always visible
+            return PDFView(filePath: provider.pdfLocalPath!);
+          } else {
+            return const Center(child: Text("No PDF available"));
+          }
+        },
+      ),
     );
   }
 }

@@ -167,6 +167,7 @@ class QuotationDetails {
   String? companygstno;
   String? partyname;
   String? email;
+  String? phone;
   String? qtdate;
   String? shiptdate;
 
@@ -179,6 +180,7 @@ class QuotationDetails {
         this.companygstno,
         this.partyname,
         this.email,
+        this.phone,
         this.qtdate,
         this.shiptdate});
 
@@ -191,6 +193,7 @@ class QuotationDetails {
     companygstno = json['companygstno'];
     partyname = json['partyname'];
     email = json['email'];
+    phone = json['phone'];
     qtdate = json['qtdate'];
     shiptdate = json['shiptdate'];
   }
@@ -205,6 +208,7 @@ class QuotationDetails {
     data['companygstno'] = this.companygstno;
     data['partyname'] = this.partyname;
     data['email'] = this.email;
+    data['phone'] = this.phone;
     data['qtdate'] = this.qtdate;
     data['shiptdate'] = this.shiptdate;
     return data;
@@ -320,7 +324,7 @@ class MoveTo {
 class PaymentDetails {
   String? freightCharge;
   String? advancePaid;
-  int? gstPercent;
+  String? gstPercent;
   String? pakingcharge;
   String? unpakingcharge;
   String? lodingcharge;
@@ -333,6 +337,7 @@ class PaymentDetails {
   String? stcharge;
   String? octriogreentax;
   String? surcharge;
+  String? surchargevalue;
   String? gstshowhide;
   String? gsttype;
   String? remark;
@@ -354,6 +359,7 @@ class PaymentDetails {
         this.stcharge,
         this.octriogreentax,
         this.surcharge,
+        this.surchargevalue,
         this.gstshowhide,
         this.gsttype,
         this.remark,
@@ -375,6 +381,7 @@ class PaymentDetails {
     stcharge = json['stcharge'];
     octriogreentax = json['octriogreentax'];
     surcharge = json['surcharge'];
+    surchargevalue = json['surchargevalue'];
     gstshowhide = json['gstshowhide'];
     gsttype = json['gsttype'];
     remark = json['remark'];

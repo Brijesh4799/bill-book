@@ -5,8 +5,8 @@ class CustomButton extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
   final Color? buttonColor;
-  final Color? borderColor; // New nullable border color parameter
-  final Color? textColor; // New nullable text color parameter
+  final Color? borderColor;
+  final Color? textColor;
   final Icon? icon;
   final String? imagePath;
 
@@ -15,8 +15,8 @@ class CustomButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     this.buttonColor,
-    this.borderColor, // Include border color in the constructor
-    this.textColor, // Include text color in the constructor
+    this.borderColor,
+    this.textColor,
     this.icon,
     this.imagePath,
   }) : super(key: key);
@@ -34,8 +34,8 @@ class CustomButton extends StatelessWidget {
           color: buttonColor ?? const Color(0xFF137DC7),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: borderColor ?? Colors.transparent, // Use transparent if no border color is provided
-            width: 2, // You can adjust the border width as needed
+            color: borderColor ?? Colors.transparent,
+            width: 2,
           ),
         ),
         child: Center(
@@ -43,17 +43,17 @@ class CustomButton extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (icon != null) ...[
-                icon!, // Display the icon if it's provided
-                const SizedBox(width: 8), // Add some spacing between icon and text
+                icon!,
+                const SizedBox(width: 8),
               ],
               if ( imagePath!= null) ...[
-                CustomImageView(imagePath: imagePath,height: screenHeight * 0.05,), // Display the icon if it's provided
-                const SizedBox(width: 8), // Add some spacing between icon and text
+                CustomImageView(imagePath: imagePath,height: screenHeight * 0.05,),
+                const SizedBox(width: 8),
               ],
               Text(
                 label,
                 style: TextStyle(
-                  color: textColor ?? Colors.white, // Use provided text color or default to white
+                  color: textColor ?? Colors.white,
                   fontSize: 20,
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.w600,

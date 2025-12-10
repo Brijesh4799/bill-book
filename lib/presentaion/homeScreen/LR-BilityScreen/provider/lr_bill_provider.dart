@@ -8,6 +8,7 @@ class LRBillProvider with ChangeNotifier{
   //LR /Bility Details
 
    TextEditingController lrNumberController = TextEditingController();
+   TextEditingController risktypecontroller = TextEditingController();
    TextEditingController lrDateController = TextEditingController();
 
    //Truck Vehicle Details
@@ -49,6 +50,7 @@ class LRBillProvider with ChangeNotifier{
    TextEditingController totalWeightController = TextEditingController();
    TextEditingController receiveConditionController = TextEditingController();
    TextEditingController remarkController = TextEditingController();
+   TextEditingController weightController = TextEditingController();
 
    //Payment Details
 
@@ -61,6 +63,8 @@ class LRBillProvider with ChangeNotifier{
    TextEditingController stChargeController = TextEditingController();
    TextEditingController otherChargeController = TextEditingController();
    TextEditingController lrCnChargeController = TextEditingController();
+   TextEditingController gstcontroller = TextEditingController();
+   TextEditingController gstpaidcontroller = TextEditingController();
 
    //Material Insurance
 
@@ -69,6 +73,7 @@ class LRBillProvider with ChangeNotifier{
    TextEditingController insuranceDateController = TextEditingController();
    TextEditingController insuredAmountController = TextEditingController();
    TextEditingController insuranceRiskController = TextEditingController();
+   TextEditingController materialInsurancecontroller = TextEditingController();
 
    //Demurrage Charge
 
@@ -83,6 +88,7 @@ class LRBillProvider with ChangeNotifier{
    TextEditingController ewayBillGenerateDateController = TextEditingController();
    TextEditingController ewayBillExpireDateController = TextEditingController();
    TextEditingController ewayBillExtendedPeriodController = TextEditingController();
+   TextEditingController demurrageChargeapplicableController = TextEditingController();
 
    String? _riskTypeSelected;
 
@@ -101,7 +107,6 @@ class LRBillProvider with ChangeNotifier{
    }
 
    String? _weightUnitOption;
-   //final TextEditingController totalWeightController = TextEditingController();
 
    String? get weightUnitOption => _weightUnitOption;
 
@@ -197,6 +202,7 @@ class LRBillProvider with ChangeNotifier{
          "formData": {
            "lrDetails": {
              "lrNumber": lrNumberController.text.trim(),
+             "risktype": risktypecontroller.text.trim(),
              "lrDate": lrDateController.text.trim(),
            },
            "truckVehicleDetails": {
@@ -220,23 +226,23 @@ class LRBillProvider with ChangeNotifier{
              "consignorAddress": addressController.text.trim(), // if needed
            },
            "moveTo": {
-             "consigneeName": "", // add if you have consignee fields
-             "consigneePhone": "",
-             "consigneeCountry": "",
-             "consigneeaddress": "",
-             "consigneecity": "",
-             "consigneestate": "",
-             "consigneepincode": "",
-             "consigneegstNo": "",
+             "consigneeName": consigneeNameController.text.trim(), // add if you have consignee fields
+             "consigneePhone": consigneePhoneController.text.trim(),
+             "consigneeCountry": toCountryController.text.trim(),
+             "consigneeaddress": toAddressController.text.trim(),
+             "consigneecity": toCityController.text.trim(),
+             "consigneestate": toStateController.text.trim(),
+             "consigneepincode": toPincodeController.text.trim(),
+             "consigneegstNo": toGstinController.text.trim(),
            },
            "packageDetails": {
              "packageNumber": packageController.text.trim(),
              "packageDescription": descriptionController.text.trim(),
-             "packageActualWeight": totalWeightController.text.trim(),
+             "packageActualWeight": weightController.text.trim(),
              "receivePackageCondition": receiveConditionController.text.trim(),
              "packageRemark": remarkController.text.trim(),
              "packageType": "", // Add if available
-             "packageChangeWeight": "", // Add if available
+             "packageChangeWeight": totalWeightController.text.trim(), // Add if available
              "allItemsInGoodCondition": true, // or a boolean value from checkbox
            },
            "paymentDetails": {
@@ -249,8 +255,8 @@ class LRBillProvider with ChangeNotifier{
              "STCharge": stChargeController.text.trim(),
              "otherCharge": otherChargeController.text.trim(),
              "LRCNCharge": lrCnChargeController.text.trim(),
-             "paymentGst": "", // Add if needed
-             "paymentGstPaidBy": "", // Add if needed
+             "paymentGst": gstcontroller.text.trim(), // Add if needed
+             "paymentGstPaidBy": gstpaidcontroller.text.trim(), // Add if needed
            },
            "materialInsurance": {
              "insuranceCompany": insuranceCompanyController.text.trim(),
@@ -258,12 +264,12 @@ class LRBillProvider with ChangeNotifier{
              "insuranceDate": insuranceDateController.text.trim(),
              "insuranceAmount": insuredAmountController.text.trim(),
              "insuranceRisk": insuranceRiskController.text.trim(),
-             "materialInsurance": "", // Add if needed
+             "materialInsurance": materialInsurancecontroller.text.trim(), // Add if needed
            },
            "demurrageCharge": {
              "demurrageChargeApplicable": demurrageChargeController.text.trim().toLowerCase() == 'true',
              "chargePerDay": "", // Add if needed
-             "moreThanDays": "", // Add if needed
+             "moreThanDays": demurrageChargeapplicableController.text.trim(), // Add if needed
            },
            "invoiceEWayBill": {
              "goodValue": goodsValueController.text.trim(),

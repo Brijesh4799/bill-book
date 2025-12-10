@@ -54,6 +54,7 @@ class _DetailFormState extends State<DetailForm> {
                 children: [
                   inputTextFields(
                     title: "Your Name*",
+                    inputType: TextInputType.text,
                     textEditingController:provider. nameController,
                   ),
                   SizedBox(height: screenHeight * 0.02),
@@ -64,6 +65,7 @@ class _DetailFormState extends State<DetailForm> {
                   SizedBox(height: screenHeight * 0.02),
                   inputTextFields(
                     title: "Your Email*",
+                    inputType: TextInputType.emailAddress,
                     textEditingController: provider.emailController,
                   ),
                   SizedBox(height: screenHeight * 0.02),
@@ -78,22 +80,6 @@ class _DetailFormState extends State<DetailForm> {
 
                       provider.updateProfile( mobileNumber: widget.mobileNumber,context: context);
 
-                      /* HelperFunctions helper = HelperFunctions();
-                    bool isConnected = await helper.isConnected();
-                    if (!isConnected) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('No internet connection')),
-                      );
-                      return;
-                    } else {
-                      AuthTokenProvider().saveToken("6324682");
-                      print('Proceeding with Home logic...');//todo add vallidation on the fields
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (context) => HomeNavController()),
-                            (route) => false,
-                      );
-                    }*/
                     },
                   ),
                 ],

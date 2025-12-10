@@ -1,5 +1,8 @@
 import 'dart:convert';
 
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../../../WebServices/app_url.dart';
 import '../../../../WebServices/network/network_api_services.dart';
 import '../get_byid_model/proforma_getbyid_model.dart';
@@ -8,9 +11,26 @@ import '../model/proforma_pdf_model.dart';
 class ProformaPdfRepository{
 
   final _apiService = NetworkApiServices();
-  Future<PeoformaPdfModel> getProformaData() async {
+  // Future<PeoformaPdfModel> getProformaData() async {
+  //   try {
+  //     final response = await _apiService.getApiWithToken(AppUrl.proformainvoice);
+  //     print('response: $response');
+  //
+  //     if (response != null) {
+  //       // Parse the response into ProductsModel
+  //       return PeoformaPdfModel.fromJson(response);
+  //     } else {
+  //       throw Exception('Failed to load Cart data: response is null');
+  //     }
+  //   } catch (e) {
+  //     print('Error fetching Cart data: $e');
+  //     rethrow;
+  //   }
+  // }
+
+  Future<PeoformaPdfModel> getProformaData({required int pageCount}) async {
     try {
-      final response = await _apiService.getApiWithToken(AppUrl.proformainvoice);
+      final response = await _apiService.getApiWithToken("${AppUrl.proformainvoice}?page=$pageCount&limit=10");
       print('response: $response');
 
       if (response != null) {
@@ -54,7 +74,7 @@ class ProformaPdfRepository{
       print('PATCH Response: $response');
 
       if (response != null) {
-        getProformaData();
+        getProformaData(pageCount:1);
         return PeoformaPdfModel.fromJson(response);
       } else {
         throw Exception('Failed to update packing data: response is null');
@@ -83,6 +103,35 @@ class ProformaPdfRepository{
     } catch (e) {
       print('Error fetching Cart data: $e');
       rethrow;
+    }
+  }
+
+
+  Future<dynamic> proformapdfApi(String id) async {
+    try {
+      final url = "${AppUrl.proformaPDF}/$id/pdf";
+      print("[log] PDF Url => $url");
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      var token = pref.getString("token");
+
+      //final token = await _apiService.getToken(); // implement getToken() in your service
+      print("[log] token => $token");
+
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/pdf",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return response.bodyBytes; // ✅ raw PDF bytes
+      } else {
+        throw Exception("Failed to load PDF. Status: ${response.statusCode}");
+      }
+    } catch (e) {
+      throw Exception("Error fetching PDF: $e");
     }
   }
 

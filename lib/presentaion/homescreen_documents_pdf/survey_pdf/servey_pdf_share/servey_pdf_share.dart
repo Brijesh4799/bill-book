@@ -6,79 +6,36 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-class PdfDownloader {
-  static Future<void> downloadAndSharePdf(String url) async {
-    // Request storage permission
-    var status = await Permission.storage.request();
-    if (!status.isGranted) {
-      return;
-    }
-
-    try {
-      // Download file
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        final bytes = response.bodyBytes;
-
-        // Save to temp directory
-        final dir = await getTemporaryDirectory();
-        final file = File("${dir.path}/survey.pdf");
-        await file.writeAsBytes(bytes);
-
-        // Share PDF
-        await Share.shareXFiles([XFile(file.path)], text: "Here is your survey PDF");
-      }
-    } catch (e) {
-      print("Error downloading PDF: $e");
-    }
-  }
-
-  static void downloadAndOpenPdf(String s) async {
-    try {
-      final response = await http.get(Uri.parse(s));
-      if (response.statusCode == 200) {
-        final dir = await getTemporaryDirectory();
-        String filePath = "${dir.path}/downloaded_file.pdf";
-        File file = File(filePath);
-        await file.writeAsBytes(response.bodyBytes);
-        await OpenFile.open(filePath);
-      } else {
-        throw Exception("Failed to download PDF. Status: ${response.statusCode}");
-      }
-    } catch (e) {
-      debugPrint("Error downloading PDF: $e");
-    }
-  }
-
-
-
-  //static void downloadAndOpenPdf(String s) {}
-}
-
-
-
-
+import '../../quotation_pdf/repo/quotation_pdf_repositroy.dart';
 
 class PdfDownloadershare {
-  static Future<void> downloadAndSharePdf(String url) async {
+  static final _repository = QuotationPdfRepository();
+
+  /// Download and share PDF using quotation ID
+  static Future<void> downloadAndSharePdf(String quotationId) async {
     try {
-      // Download PDF from API
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
+      // Fetch PDF bytes from repository
+      final responseBytes = await _repository.quotationpdfApi(quotationId);
+
+      if (responseBytes != null) {
+        // Save PDF locally
         final directory = await getTemporaryDirectory();
-        final filePath = '${directory.path}/shared_pdf.pdf';
+        final filePath = '${directory.path}/quotation_$quotationId.pdf';
         final file = File(filePath);
+        await file.writeAsBytes(responseBytes);
 
-        // Save the PDF locally
-        await file.writeAsBytes(response.bodyBytes);
+        print("✅ PDF saved at: $filePath");
 
-        // Share the file
-        await Share.shareXFiles([XFile(filePath)], text: 'Here is your Survey PDF!');
+        // Share the PDF
+        await Share.shareXFiles([XFile(filePath)], text: 'Here is your Servey PDF!');
       } else {
-        print("Failed to download PDF. Status code: ${response.statusCode}");
+        print("❌ Empty PDF response from API");
       }
     } catch (e) {
-      print("Error downloading or sharing PDF: $e");
+      print("❌ Error downloading or sharing PDF: $e");
     }
   }
 }
+
+
+

@@ -28,7 +28,6 @@ abstract class BaseApiServices {
 
   Future<dynamic> deleteApiWithToken(String url) ;
 
-  //Future<dynamic> patchApiWithToken(dynamic data,String url) ;
   Future<dynamic> patchApiWithToken(String url, Map<String, dynamic> data);
 
 

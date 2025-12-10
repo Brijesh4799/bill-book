@@ -1,11 +1,19 @@
-/*
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
+import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../../core/widgets/custom_Textbutton.dart';
 import '../../../../core/widgets/custom_app_bar/ui/customAppBar.dart';
 import '../../../../core/widgets/custom_input_text_field.dart';
+import '../../../../core/widgets/custom_more_horiz_scroll_page.dart';
+import '../../../homescreen_documents_pdf/Packing_list_pdf/packing_edit_screen/packing_edit_screen.dart';
+import '../../../homescreen_documents_pdf/Packing_list_pdf/packing_list_pdf_screen/packing_list_pdf_screen.dart';
+import '../../../homescreen_documents_pdf/Packing_list_pdf/pdf_page/download_pdf.dart';
+import '../../../homescreen_documents_pdf/Packing_list_pdf/pdf_page/send_pdf.dart';
+import '../../../homescreen_documents_pdf/Packing_list_pdf/provider/pcking_list_pdf_provider.dart';
+import '../../../homescreen_documents_pdf/quotation_pdf/provider/quotation_pdf_provider.dart';
+import '../../../homescreen_documents_pdf/quotation_pdf/quotation_webview_pdf/loding_page.dart';
+import '../../../homescreen_documents_pdf/quotation_pdf/subscription_pdf/subscription_pdf_provider.dart';
 import '../repo/packing_report_download_repogistory.dart';
 import '../model/packing_report_download_model.dart';
 
@@ -19,12 +27,10 @@ class PackingRepotsDownload extends StatefulWidget {
 class _PackingRepotsDownloadState extends State<PackingRepotsDownload> {
   final TextEditingController startDateController = TextEditingController();
   final TextEditingController endDateController = TextEditingController();
-
   final PackingreportPdfRepository _repo = PackingreportPdfRepository();
-
   List<Data> reportData = [];
-
-  Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
+  Future<void> _selectDate(
+      BuildContext context, TextEditingController controller) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -35,18 +41,15 @@ class _PackingRepotsDownloadState extends State<PackingRepotsDownload> {
       controller.text = DateFormat('yyyy-MM-dd').format(picked);
     }
   }
-
   void _downloadReport() async {
     String startDate = startDateController.text.trim();
     String endDate = endDateController.text.trim();
-
     if (startDate.isEmpty || endDate.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please select both start and end date')),
+        const SnackBar(content: Text('Please select both start and end date')),
       );
       return;
     }
-
     try {
       final report = await _repo.getpackingreportdataApi(startDate, endDate);
       setState(() {
@@ -55,55 +58,15 @@ class _PackingRepotsDownloadState extends State<PackingRepotsDownload> {
     } catch (e) {
       print('Error downloading report: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to download report')),
+        const SnackBar(content: Text('Failed to download report')),
       );
     }
   }
-
-  Widget _buildReportCard(Data item) {
+  bool isLoading = false;
+  Widget _buildReportCard(Data item, int index) {
     final customer = item.formData?.customerDetails;
-
-    return
-     */
-/* Card(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      elevation: 3,
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Packing Number: ${customer?.packingNumber ?? "N/A"}',
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            SizedBox(height: 5),
-            Text('Name: ${customer?.name ?? "N/A"}'),
-            SizedBox(height: 3),
-            Text('Phone: ${customer?.phone ?? "N/A"}'),
-            SizedBox(height: 3),
-            Text('Date: ${customer?.date ?? "N/A"}'),
-            SizedBox(height: 3),
-            Text('Move From: ${customer?.moveFrom ?? "N/A"}'),
-            SizedBox(height: 3),
-            Text('Move To: ${customer?.moveTo ?? "N/A"}'),
-            SizedBox(height: 3),
-            Text('Vehicle No: ${customer?.vehicleNo ?? "N/A"}'),
-            SizedBox(height: 3),
-            if (item.formData?.itemParticulars != null &&
-                item.formData!.itemParticulars!.isNotEmpty) ...[
-              Divider(),
-              Text('Items:', style: TextStyle(fontWeight: FontWeight.bold)),
-              ...item.formData!.itemParticulars!.map((part) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2),
-                child: Text(
-                    '- ${part.itemName ?? ''} | Qty: ${part.quantity ?? 0} | Box: ${part.boxNumber ?? ''}'),
-              )),
-            ],
-          ],
-        ),
-      ),
-    );*//*
-
-    Container(
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.black, width: 1),
@@ -133,183 +96,6 @@ class _PackingRepotsDownloadState extends State<PackingRepotsDownload> {
                 const Spacer(),
                 Text(
                   'PACKING LIST: ${index + 1}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(title: 'Packing Reports'),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(16.0),
-          color: Colors.white,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Download', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              SizedBox(height: 15),
-              Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => _selectDate(context, startDateController),
-                      child: AbsorbPointer(
-                        child: inputTextFields(
-                          label: 'Start Date',
-                          textEditingController: startDateController,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => _selectDate(context, endDateController),
-                      child: AbsorbPointer(
-                        child: inputTextFields(
-                          label: 'End Date',
-                          textEditingController: endDateController,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 20),
-              CustomButton(label: 'Download Reports', onPressed: _downloadReport),
-              SizedBox(height: 20),
-              reportData.isNotEmpty
-                  ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: reportData.map(_buildReportCard).toList(),
-              )
-                  : Text('No data found. Please try different dates.',
-                  style: TextStyle(color: Colors.grey)),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-*/
-
-
-
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
-
-import '../../../../core/widgets/custom_Textbutton.dart';
-import '../../../../core/widgets/custom_app_bar/ui/customAppBar.dart';
-import '../../../../core/widgets/custom_input_text_field.dart';
-import '../../../../core/widgets/custom_more_horiz_scroll_page.dart';
-import '../../../homescreen_documents_pdf/Packing_list_pdf/packing_edit_screen/packing_edit_screen.dart';
-import '../../../homescreen_documents_pdf/Packing_list_pdf/packing_list_pdf_screen/packing_list_pdf_screen.dart';
-import '../../../homescreen_documents_pdf/Packing_list_pdf/provider/pcking_list_pdf_provider.dart';
-import '../../../homescreen_documents_pdf/survey_pdf/servey_pdf_share/servey_pdf_share.dart';
-import '../repo/packing_report_download_repogistory.dart';
-import '../model/packing_report_download_model.dart';
-
-class PackingRepotsDownload extends StatefulWidget {
-  const PackingRepotsDownload({super.key});
-
-  @override
-  State<PackingRepotsDownload> createState() => _PackingRepotsDownloadState();
-}
-
-class _PackingRepotsDownloadState extends State<PackingRepotsDownload> {
-  final TextEditingController startDateController = TextEditingController();
-  final TextEditingController endDateController = TextEditingController();
-
-  final PackingreportPdfRepository _repo = PackingreportPdfRepository();
-
-  List<Data> reportData = [];
-
-  Future<void> _selectDate(
-      BuildContext context, TextEditingController controller) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2100),
-    );
-    if (picked != null) {
-      controller.text = DateFormat('yyyy-MM-dd').format(picked);
-    }
-  }
-
-  void _downloadReport() async {
-    String startDate = startDateController.text.trim();
-    String endDate = endDateController.text.trim();
-
-    if (startDate.isEmpty || endDate.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select both start and end date')),
-      );
-      return;
-    }
-
-    try {
-      final report = await _repo.getpackingreportdataApi(startDate, endDate);
-      setState(() {
-        reportData = report.data ?? [];
-      });
-    } catch (e) {
-      print('Error downloading report: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to download report')),
-      );
-    }
-  }
-  bool isLoading = false;
-  /// 🔹 FIX: Add `index` parameter here
-  Widget _buildReportCard(Data item, int index) {
-    final customer = item.formData?.customerDetails;
-
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.black, width: 1),
-      ),
-      child: Column(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              color: Color(0xFF137DC7),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
-            ),
-            height: 40,
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Row(
-              children: [
-                Text(
-                  '${index + 1}', // ✅ Now works
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  'PACKING LIST: ${index + 1}', // ✅ Now works
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 14,
@@ -509,16 +295,13 @@ class _PackingRepotsDownloadState extends State<PackingRepotsDownload> {
                               ],
                             ),
                           );
-
                           if (confirm == true) {
                             final success = await Provider.of<
-                                PackingListPdfProvider
-                            >(
+                                PackingListPdfProvider>(
                               context,
                               listen: false,
                             ).deletepacking(item.sId ?? '');
                             print(item.sId);
-
                             ScaffoldMessenger.of(
                               context,
                             ).showSnackBar(
@@ -547,7 +330,6 @@ class _PackingRepotsDownloadState extends State<PackingRepotsDownload> {
                               ),
                             ],
                           ),
-
                           child: Row(
                             children: [
                               Icon(Icons.delete, color: Colors.black),
@@ -563,7 +345,6 @@ class _PackingRepotsDownloadState extends State<PackingRepotsDownload> {
                                       fontSize: 12,
                                     ),
                                   ),
-                                  //Text('भुगतान हटाएं',style: TextStyle(fontSize: 12),),
                                   Text(
                                     'पैकेजिंग हटाएं',
                                     style: TextStyle(fontSize: 12),
@@ -575,17 +356,15 @@ class _PackingRepotsDownloadState extends State<PackingRepotsDownload> {
                         ),
                       ),
                     ),
-
                     Expanded(
                       child: InkWell(
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-
                               builder:
                                   (context) =>
-                                  PackingListPdfWebViewScreen(
+                                      PackagePdfWebViewScreen(
                                     id: item.sId ?? '',
                                   ),
                             ),
@@ -594,7 +373,6 @@ class _PackingRepotsDownloadState extends State<PackingRepotsDownload> {
                         child: Container(
                           padding: EdgeInsets.all(5),
                           margin: EdgeInsets.only(left: 4),
-                          // spacing between two containers
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(10),
@@ -644,10 +422,28 @@ class _PackingRepotsDownloadState extends State<PackingRepotsDownload> {
                   children: [
                     Expanded(
                       child: InkWell(
-                        onTap: () {
-                          PdfDownloadershare.downloadAndSharePdf(
-                            "http://167.71.232.245:8970/api/user/quotation/${item.sId}/pdf",
-                          );
+                        onTap: () async {
+                          if (item.sId != null) {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) => LoadingDialog(),
+                            );
+                            final provider =
+                            Provider.of<QuatationPdfProvider>(context, listen: false);
+                            await provider.fetchQuotationSignature(item.sId!, "packing");
+                            if (provider.signatureLink != null) {
+                              final link = provider.signatureLink!;
+                              await Share.share(
+                                "Here is the customer signature PDF link:\n$link",
+                                subject: "Customer Signature PDF",
+                              );
+                            } else {
+                              print(" Signature link is null");
+                            }
+                          } else {
+                            print(" item.sId is null");
+                          }
                         },
                         child: Container(
                           padding: EdgeInsets.all(5),
@@ -671,14 +467,20 @@ class _PackingRepotsDownloadState extends State<PackingRepotsDownload> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  //Text('Customer Signature',
-                                  Text('Customer Sign..',
-                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                                    overflow: TextOverflow.ellipsis,  // show ...
-                                    maxLines: 2,                      // single line only
+                                  Text(
+                                    'Customer Sign..',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
                                     softWrap: true,
                                   ),
-                                  Text('ग्राहक के हस्ताक्षर', style: TextStyle(fontSize: 12)),
+                                  Text(
+                                    'ग्राहक के हस्ताक्षर',
+                                    style: TextStyle(fontSize: 12),
+                                  ),
                                 ],
                               ),
                             ],
@@ -686,60 +488,38 @@ class _PackingRepotsDownloadState extends State<PackingRepotsDownload> {
                         ),
                       ),
                     ),
-
-
-                    /*Expanded(
-                      child: InkWell(
-                        onTap: () {
-                          PdfDownloadershare.downloadAndSharePdf(
-                            "http://167.71.232.245:8970/api/user/packing/${item.sId}/pdf",
-                          );
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(5),
-                          margin: EdgeInsets.only(left: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black26,
-                                blurRadius: 6,
-                                spreadRadius: 2,
-                                offset: Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.picture_as_pdf, color: Colors.black),
-                              SizedBox(width: 5),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Share Packing Pdf',
-                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                                  Text('पैकेजिंग पीडीएफ भेजें', style: TextStyle(fontSize: 12)),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),*/
                     Expanded(
                       child: InkWell(
-                        onTap: isLoading
-                            ? null
-                            : () async {
-                          setState(() => isLoading = true);
-
-                          final url =
-                              "http://167.71.232.245:8970/api/user/packing/${item.sId}/pdf";
-
-                          await PdfDownloadershare.downloadAndSharePdf(url);
-
-                          setState(() => isLoading = false);
+                        onTap: () async {
+                          if (item.sId != null) {
+                            final subscriptionProvider =
+                            Provider.of<SubscriptionPdfProvider>(context, listen: false);
+                            if (!subscriptionProvider.isSubscribed) {
+                              showDialog(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: const Text("Subscription Required"),
+                                  content: const Text(
+                                      "You are not subscribed. Please subscribe to share PDFs."),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.of(ctx).pop(),
+                                      child: const Text("OK"),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              return;
+                            }
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) => LoadingDialog(),
+                            );
+                            await PdfDownloadersharepackage.downloadAndSharePdf(item.sId!);
+                          } else {
+                            print(" item.sId is null");
+                          }
                         },
                         child: Container(
                           padding: const EdgeInsets.all(5),
@@ -791,13 +571,11 @@ class _PackingRepotsDownloadState extends State<PackingRepotsDownload> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-
                     Expanded(
                       child: GestureDetector(
                         onTap: () async {
                           final String userId = item.sId ?? "";
                           print("userId");
-
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -844,14 +622,38 @@ class _PackingRepotsDownloadState extends State<PackingRepotsDownload> {
                         ),
                       ),
                     ),
-
-
                     Expanded(
                       child: InkWell(
-                        onTap: () {
-                          PdfDownloader.downloadAndOpenPdf(
-                            "http://167.71.232.245:8970/api/user/packing/${item.sId}/pdf",
-                          );
+                        onTap: () async {
+                          if (item.sId != null) {
+                            final subscriptionProvider =
+                            Provider.of<SubscriptionPdfProvider>(context, listen: false);
+                            if (!subscriptionProvider.isSubscribed) {
+                              showDialog(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: const Text("Subscription Required"),
+                                  content: const Text(
+                                      "You are not subscribed. Please subscribe to download PDFs."),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.of(ctx).pop(),
+                                      child: const Text("OK"),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              return;
+                            }
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) => LoadingDialog(),
+                            );
+                            await PdfDownloaderpackage.downloadAndOpenPdf(item.sId!);
+                          } else {
+                            print(" item.sId is null");
+                          }
                         },
                         child: Container(
                           padding: EdgeInsets.all(5),
@@ -870,21 +672,14 @@ class _PackingRepotsDownloadState extends State<PackingRepotsDownload> {
                           ),
                           child: Row(
                             children: [
-                              Icon(
-                                Icons.picture_as_pdf,
-                                color: Colors.black,
-                              ),
+                              Icon(Icons.picture_as_pdf, color: Colors.black),
                               SizedBox(width: 5),
                               Column(
-                                crossAxisAlignment:
-                                CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     'Download PDF',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
-                                    ),
+                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                                   ),
                                   Text(
                                     'डाउनलोड पीडीएफ',
@@ -902,8 +697,6 @@ class _PackingRepotsDownloadState extends State<PackingRepotsDownload> {
               ],
             ),
           ),
-
-
         ],
       ),
     );
@@ -953,8 +746,6 @@ class _PackingRepotsDownloadState extends State<PackingRepotsDownload> {
               const SizedBox(height: 20),
               CustomButton(label: 'Download Reports', onPressed: _downloadReport),
               const SizedBox(height: 20),
-
-              /// 🔹 FIX: Pass `index` here using `.asMap()`
               reportData.isNotEmpty
                   ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

@@ -11,7 +11,6 @@ import '../provider/car_condition_provider.dart';
 class CarConditionScreen extends StatefulWidget {
   final String mobileNumber;
   const CarConditionScreen({Key? key, required this.mobileNumber}) : super(key: key);
-  //const CarConditionScreen({super.key});
 
   @override
   _CarConditionScreen createState() => _CarConditionScreen();
@@ -58,23 +57,13 @@ class _CarConditionScreen extends State<CarConditionScreen> {
   ];
 
   final Map<String, String> selectedAccessories = {};
-
   final TextEditingController batteryNoController = TextEditingController();
   final TextEditingController tyreNoController = TextEditingController();
   final TextEditingController otherAccessoriesController = TextEditingController();
   final TextEditingController remarkController = TextEditingController();
-
-
   final TextEditingController scratchesController = TextEditingController();
   final TextEditingController dentController = TextEditingController();
   final TextEditingController otherVisibleObservationController = TextEditingController();
-
-
-  void _saveAllValues() {
-
-  }
-
-
   @override
 
   Widget build(BuildContext context) {
@@ -102,29 +91,24 @@ class _CarConditionScreen extends State<CarConditionScreen> {
                   onPressed: () async {
                     HelperFunctions helper = HelperFunctions();
                     bool isConnected = await helper.isConnected();
-
                     if (!isConnected) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('No internet connection')),
                       );
                       return;
                     }
-
-                    // Call the provider's method
                     await provider.carconditionprovider(
                       mobileNumber: widget.mobileNumber,
                       context: context,
                     );
-
-                    // Navigate to Home Page
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => HomeNavController()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 50), // Full width button
-                    backgroundColor: Colors.blue, // Customize as needed
+                    minimumSize: Size(double.infinity, 50),
+                    backgroundColor: Colors.blue,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -140,9 +124,6 @@ class _CarConditionScreen extends State<CarConditionScreen> {
         )
     );
   }
-
-
-
   Widget _buildVehicleConditionDetailsTile(){
     return Consumer<CarConditionProvider>(
         builder: (context, provider, child){
@@ -317,7 +298,6 @@ class _CarConditionScreen extends State<CarConditionScreen> {
           return  _expansionTileWrapper(
             title: 'Accessories Details \n(वाहन के सामान का विवरण)',
             children: [
-
               inputTextFields(
                 label: 'BATTERY NO.',
                 inputType: TextInputType.number,

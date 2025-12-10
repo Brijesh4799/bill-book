@@ -149,7 +149,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(height: screenHeight * 0.06),
                 CustomButton(
                   label: 'Get OTP',
-                  onPressed: () async {
+                  onPressed: () async
+                  {
                     HelperFunctions helper = HelperFunctions();
                     bool isConnected = await helper.isConnected();
 

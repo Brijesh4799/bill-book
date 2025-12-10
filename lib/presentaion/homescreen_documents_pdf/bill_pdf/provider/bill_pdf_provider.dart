@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../get_byid_model/bill_get_byId_model.dart';
 import '../model/bill_pdf_model.dart';
@@ -84,7 +87,7 @@ class BillPdfProvider with ChangeNotifier {
   BillPdfModel? _billList;
   BillPdfModel? get billList => _billList;
 
-  BillPdfModel? _billPdf; // ✅ Declare this to store single bill update response
+  BillPdfModel? _billPdf;
   BillPdfModel? get billPdf => _billPdf;
 
   BillGetDataByIdModel? billGetDataByIdModel;
@@ -95,18 +98,65 @@ class BillPdfProvider with ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-  Future<void> billListData() async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
+  // Future<void> billListData() async {
+  //   _isLoading = true;
+  //   _errorMessage = null;
+  //   notifyListeners();
+  //   try {
+  //     _billList = await _billPdfRepository.getbilldatadataApi();
+  //   } catch (e) {
+  //     _errorMessage = 'Failed to load survey list: ${e.toString()}';
+  //   } finally {
+  //     _isLoading = false;
+  //     notifyListeners();
+  //   }
+  // }
 
-    try {
-      _billList = await _billPdfRepository.getbilldatadataApi();
-    } catch (e) {
-      _errorMessage = 'Failed to load survey list: ${e.toString()}';
-    } finally {
-      _isLoading = false;
+
+  bool isLoading2 = false;
+  bool loading = false;
+  bool isLoadMoreRunning = false;
+  bool hasNextPage = true;
+  int page = 1;
+  void setLoading(bool loader) {
+    loading = loader;
+    notifyListeners();
+  }
+  Future<void> billListData({bool isLoadMore = false}) async {
+    if (!isLoadMore) {
+      page = 1;
+      hasNextPage = true;
+      _billList = null;
+      setLoading(true);
+    } else {
+      if (isLoadMoreRunning || !hasNextPage) return;
+      isLoadMoreRunning = true;
       notifyListeners();
+    }
+    try {
+      final response = await _billPdfRepository.getbilldatadataApi(pageCount: page);
+      if (response.status == true &&
+          response.data != null &&
+          response.data!.isNotEmpty) {
+        if (isLoadMore) {
+          _billList!.data!.addAll(response.data!);
+        } else {
+          _billList = response;
+        }
+        page++;
+      } else {
+        hasNextPage = false;
+      }
+    } catch (e) {
+      print("Pagination Error: $e");
+      hasNextPage = false;
+    } finally {
+      if (!isLoadMore) {
+        setLoading(false);
+      } else {
+        isLoadMoreRunning = false;
+        notifyListeners();
+      }
     }
   }
 
@@ -116,7 +166,7 @@ class BillPdfProvider with ChangeNotifier {
     try {
       final result = await _repo.deleteBillById(id);
       if (result.status == true) {
-        await billListData(); // Refresh list after deletion
+        await billListData();
         return true;
       } else {
         print('Delete failed: ${result.message}');
@@ -340,15 +390,47 @@ class BillPdfProvider with ChangeNotifier {
           moveToController.text = invoice.invoiceMoveTo ?? "";
           vehicleNumberController.text = invoice.invoiceVehicleNumber ?? "";
         }
-
-
-
-
-
       }
     } catch (e) {
       _errorMessage = 'Failed to load packing data: ${e.toString()}';
       print(_errorMessage);
     }
   }
+
+
+  String? pdfLocalPath;
+  bool pdfLoading = false;
+  String? _errorMessage2;
+
+  String? get errorMessage2 => _errorMessage2;
+
+  Future<void> fetchbillPdf(String id) async {
+    pdfLoading = true;
+    _errorMessage2 = null;
+    notifyListeners();
+
+    try {
+      final responseBytes = await  _billPdfRepository.billpdfApi(id);
+
+      if (responseBytes != null) {
+        // Save PDF in temporary directory
+        final dir = await getTemporaryDirectory();
+        final file = File('${dir.path}/bill_$id.pdf');
+        await file.writeAsBytes(responseBytes);
+
+        pdfLocalPath = file.path;
+        print("✅ PDF saved at: $pdfLocalPath");
+      } else {
+        _errorMessage2 = "Empty PDF response";
+      }
+    } catch (e) {
+      _errorMessage2 = "Failed to fetch PDF: $e";
+      print(_errorMessage2);
+    } finally {
+      pdfLoading = false;
+      notifyListeners();
+    }
+  }
+
+
 }

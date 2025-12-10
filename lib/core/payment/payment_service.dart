@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -23,6 +21,7 @@ class PaymentService {
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
     debugPrint("🟢 Payment Success: ${response.paymentId}");
+    debugPrint("🟢 Payment signature: ${response.signature}");
     paymentId = response.paymentId;
     Fluttertoast.showToast(msg: 'Payment Successful: ${response.paymentId}');
     if (onPaymentSuccessCallback != null) {
@@ -42,7 +41,6 @@ class PaymentService {
     debugPrint("🟡 External Wallet Chosen: ${response.walletName}");
     Fluttertoast.showToast(msg: 'External Wallet Selected: ${response.walletName}');
   }
-
   Future<void> openCheckout({
     required String price,
     required String orderId,
@@ -53,30 +51,32 @@ class PaymentService {
     onPaymentSuccessCallback = onPaymentSuccess;
 
     var options = {
-      'key': 'rzp_test_ikM9rKia4yUbG5',
-      'amount': int.parse(price),
-      'name': 'Positive Milk',
+      //'key': 'rzp_test_hCRLFPf6rY3elm',
+      'key': 'rzp_live_RLOiYd9Br3ZihB',
+      'amount': int.parse(price) * 100, // Ensure it's in paise
+      'name': 'Bill Book',
       'description': 'Order Payment',
       'order_id': orderId,
       'prefill': {
         'contact': '9123456789',
-        'email': 'test@example.com'
+        'email': 'homeshiftingmart@gmail.com'
       },
       'external': {
         'wallets': ['paytm']
       },
       'theme': {
-        'color': '#30B41D',
+        'color': '#137DC7',
       }
     };
 
     try {
       _razorpay?.open(options);
     } catch (e) {
-      debugPrint('Error: $e');
+      debugPrint('Payment initiation failed: ${e.toString()}');
       Fluttertoast.showToast(msg: 'Payment initiation failed');
     }
   }
+
 }
 
 

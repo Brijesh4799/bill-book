@@ -75,12 +75,40 @@ class _UserProfileState extends State<UserProfile> {
     textEditingController: provider.addressController,
     label: 'Address'
     ),
-    CustomButton(
+
+          CustomButton(
+            label: 'Save Changes',
+            onPressed: () async {
+              final provider = Provider.of<UserUpdateInputProvider>(context, listen: false);
+              bool isUpdated = await provider.userupdateprovider(
+                mobileNumber: widget.mobileNumber,
+                context: context,
+              );
+
+              if (isUpdated) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Profile updated successfully!'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Failed to update profile.'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+          ),
+
+          /*CustomButton(
     label: 'Save Changes',
     onPressed: () async {
       provider.userupdateprovider( mobileNumber: widget.mobileNumber,context: context);
     },
-    ),
+    ),*/
     ],
     ),
     ),

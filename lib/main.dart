@@ -7,6 +7,8 @@ import 'package:BillBook/presentaion/homeScreen/fov-scfFormScreen/provider/fov_s
 
 import 'package:BillBook/presentaion/homeScreen/moneyReceiptScreen/provider/money_receipt_provider.dart';
 import 'package:BillBook/presentaion/homeScreen/nocLetterscreen/provider/nocletter_provider.dart';
+import 'package:BillBook/presentaion/homeScreen/notification/notification_provider/notification_provider.dart';
+import 'package:BillBook/presentaion/homeScreen/notification/notification_ui/notification_ui.dart';
 import 'package:BillBook/presentaion/homeScreen/packingList/provider/packingProvider.dart';
 import 'package:BillBook/presentaion/homeScreen/paymentVoucherScreen/provider/payment_voucher_provider.dart';
 import 'package:BillBook/presentaion/homeScreen/quotationScreens/provider/QuotationProvider.dart';
@@ -24,6 +26,7 @@ import 'package:BillBook/presentaion/homescreen_documents_pdf/money_receipt_pdf/
 import 'package:BillBook/presentaion/homescreen_documents_pdf/noc_letter_pdf/provider/noc_letter_provider.dart';
 import 'package:BillBook/presentaion/homescreen_documents_pdf/proforma_invoice_pdf/provider/proforma_pdf_provider.dart';
 import 'package:BillBook/presentaion/homescreen_documents_pdf/quotation_pdf/provider/quotation_pdf_provider.dart';
+import 'package:BillBook/presentaion/homescreen_documents_pdf/quotation_pdf/subscription_pdf/subscription_pdf_provider.dart';
 import 'package:BillBook/presentaion/homescreen_documents_pdf/survey_pdf/provider/survey_pdf_provider.dart';
 import 'package:BillBook/presentaion/homescreen_documents_pdf/tws_form_pdf/provider/tws_pdf_provider.dart';
 import 'package:BillBook/presentaion/onboardingScreen/otp_screen/provider_screen/otp_provider.dart';
@@ -38,15 +41,20 @@ import 'package:BillBook/test/delete_account_screen.dart';
 import 'package:BillBook/test/personalityAnalysisScreen.dart';
 import 'package:BillBook/test/personality_sections_screen.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'core/firbase/firbase_service.dart';
 import 'core/widgets/custom_app_bar/provider/profile_provider.dart';
 import 'core/widgets/custom_app_bar/ui/customAppBar.dart';
 import 'core/widgets/home_page_custom/provider/home_page_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp();
+
   AwesomeNotifications().initialize(
     null,
     [
@@ -61,9 +69,12 @@ void main() async {
     ],
   );
 
+  final notificationService = FirebaseNotificationService();
+  await notificationService.init();
 
-  runApp(MyApp());
+  runApp(const MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
 
@@ -109,7 +120,8 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider(create: (_) => QuotationTearmsandCondition()),
           ChangeNotifierProvider(create: (_) => SubscriptionProvider()),
           ChangeNotifierProvider(create: (_) => StaffListProvider()),
-         // ChangeNotifierProvider(create: (_) => LrBiltyReportProvider()),
+          ChangeNotifierProvider(create: (_) => NotificationProvider()),
+          ChangeNotifierProvider(create: (_) => SubscriptionPdfProvider()),
         ],
         child:  MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -137,6 +149,7 @@ class MyApp extends StatelessWidget {
             useMaterial3: true,
           ),
           home:const SplashScreen(),
+         // home: NotificationScreen(),
           //home:const CustomAppBar(),
           //home:  PersonalitySectionsScreen(),
           // home: PersonalityQuestionScreen(),

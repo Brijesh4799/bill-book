@@ -1,5 +1,3 @@
-
-
 import 'package:BillBook/presentaion/homeScreen/setting/switch_account.dart';
 import 'package:flutter/material.dart';
 import '../../../core/localStorage/auth_token.dart';
@@ -13,9 +11,8 @@ class SettingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
-      appBar: CustomAppBar(title: 'Settings'),
+      appBar: CustomAppBar(title: 'Settings',showBackButton: false,),
       body: ListView(
         padding: EdgeInsets.symmetric(
           horizontal: screenWidth * 0.05,
@@ -29,13 +26,6 @@ class SettingScreen extends StatelessWidget {
             'assets/images/aboutUs_Icon.png',
                 (ctx) => aboutUs(ctx),
           ),
-         /* _buildListItem(
-            context,
-            "Switch Account",
-            "Add/ Switch to another account",
-            'assets/images/switchAccount_Icon.png',
-                (ctx) => switchAccount(ctx),
-          ),*/
           _buildListItem(
             context,
             "Logout",
@@ -72,21 +62,18 @@ class SettingScreen extends StatelessWidget {
       ),
     );
   }
-
   void aboutUs(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => CmsScreen()),
     );
   }
-
   void switchAccount(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => SwitchAccount()),
     );
   }
-
   void logoutDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -97,19 +84,12 @@ class SettingScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () async {
-              Navigator.of(context).pop(); // close dialog
-
-              // Debug: check token before clearing
+              Navigator.of(context).pop();
               final tokenBefore = await AuthTokenProvider().getToken();
               print(" Token before clear: $tokenBefore");
-
-              // Clear token
               await AuthTokenProvider().clearToken();
-
               final tokenAfter = await AuthTokenProvider().getToken();
-              print(" Token after clear: $tokenAfter"); // should be null
-
-              // Navigate to SplashScreen and remove all previous screens
+              print(" Token after clear: $tokenAfter");
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => const SplashScreen()),
@@ -128,5 +108,4 @@ class SettingScreen extends StatelessWidget {
       ),
     );
   }
-
 }

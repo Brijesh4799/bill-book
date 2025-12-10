@@ -43,6 +43,7 @@ class _BillScreen extends State<BillScreen> {
   final TextEditingController consigneeCityController = TextEditingController();
   final TextEditingController consigneePincodeController = TextEditingController();
   final TextEditingController consigneeAddressController = TextEditingController();
+   TextEditingController gstController = TextEditingController();
 
 // Charge option dropdowns
   String? packingChargeOption;
@@ -136,6 +137,7 @@ class _BillScreen extends State<BillScreen> {
   final TextEditingController consignorCityController = TextEditingController();
   final TextEditingController consignorPincodeController = TextEditingController();
   final TextEditingController consignorAddressController = TextEditingController();
+  final TextEditingController packingGstShow = TextEditingController();
 
 // Checkbox state for "Same as Billing"
   bool isConsignorSameAsBilling = true;
@@ -311,7 +313,6 @@ class _BillScreen extends State<BillScreen> {
                 textEditingController: provider.moveToController,
               ),
               inputTextFields(
-               // inputType: TextInputType.number,
                 label: 'VEHICLE NUMBER (गाड़ी नंबर)',
                 textEditingController: provider.vehicleNumberController,
               ),
@@ -405,7 +406,6 @@ class _BillScreen extends State<BillScreen> {
                   });
                 },
               ),
-
               if (!isConsignorSameAsBilling) ...[
                 inputTextFields(
                     label: 'CONSIGNOR NAME (भेजने वाले का नाम)',
@@ -540,14 +540,16 @@ class _BillScreen extends State<BillScreen> {
                 onDropdownChanged: (val) {
                   setState(() {
                     weightUnitOption = val;
+                    provider.weightUnitController.text = val ?? ''; // Store dropdown value
                   });
                 },
                 dropdownItems: ['KG', 'Ton', 'Gram'],
-                controller: provider.totalWeightController,
+                controller: provider.totalWeightController, // Input field controller
                 hintText: 'Enter Value',
                 dropDownhint: 'Select Unit',
                 labelText: 'TOTAL WEIGHT (कुल वजन)',
               ),
+
               inputTextFields(
                 label: 'HSN/SAC CODE',
                 textEditingController: provider.receiveConditionController,
@@ -586,6 +588,11 @@ class _BillScreen extends State<BillScreen> {
                 onDropdownChanged: (val) {
                   setState(() {
                     packingChargeOption = val;
+                    if (val == "Excluded") {
+                      provider.packingChargeController.clear(); // clear the input if "Excluded"
+                    } else {
+                      provider.packingChargeController.text = val ?? ''; // fill with selected value
+                    }
                   });
                 },
                 dropdownItems: chargeOptions,
@@ -598,6 +605,11 @@ class _BillScreen extends State<BillScreen> {
                 onDropdownChanged: (val) {
                   setState(() {
                     unpackingChargeOption = val;
+                    if (val == "Excluded") {
+                      provider.unpackingChargeController.clear(); // clear the input if "Excluded"
+                    } else {
+                      provider.unpackingChargeController.text = val ?? ''; // fill with selected value
+                    }
                   });
                 },
                 dropdownItems: chargeOptions,
@@ -610,6 +622,12 @@ class _BillScreen extends State<BillScreen> {
                 onDropdownChanged: (val) {
                   setState(() {
                     loadingChargeOption = val;
+
+                    if (val == "Excluded") {
+                      provider.loadingChargeController.clear(); // clear if "Excluded"
+                    } else {
+                      provider.loadingChargeController.text = val ?? ''; // fill with selected value
+                    }
                   });
                 },
                 dropdownItems: chargeOptions,
@@ -622,6 +640,11 @@ class _BillScreen extends State<BillScreen> {
                 onDropdownChanged: (val) {
                   setState(() {
                     unloadingChargeOption = val;
+                    if (val == "Excluded") {
+                      provider.unloadingChargeController.clear(); // clear if "Excluded"
+                    } else {
+                      provider.unloadingChargeController.text = val ?? ''; // fill with selected value
+                    }
                   });
                 },
                 dropdownItems: chargeOptions,
@@ -634,6 +657,11 @@ class _BillScreen extends State<BillScreen> {
                 onDropdownChanged: (val) {
                   setState(() {
                     packingMaterialChargeOption = val;
+                    if (val == "Excluded") {
+                      provider.packingMaterialChargeController.clear(); // clear if "Excluded"
+                    } else {
+                      provider.packingMaterialChargeController.text = val ?? ''; // fill with selected value
+                    }
                   });
                 },
                 dropdownItems: chargeOptions,
@@ -705,6 +733,11 @@ class _BillScreen extends State<BillScreen> {
                 onDropdownChanged: (val) {
                   setState(() {
                     surchargeOption = val;
+                    if (val == "Excluded") {
+                      provider.surchargeController.clear(); // clear if "Excluded"
+                    } else {
+                      provider.surchargeController.text = val ?? ''; // fill with selected value
+                    }
                   });
                 },
                 dropdownItems: surchargeOptions,
@@ -719,6 +752,7 @@ class _BillScreen extends State<BillScreen> {
                 onChanged: (value) {
                   setState(() {
                     gstOption = value;
+                    gstController.text = value ?? ''; // fill controller with selected value
                   });
                 },
                 val: (value) {
@@ -726,9 +760,11 @@ class _BillScreen extends State<BillScreen> {
                     return 'Please select an option';
                   }
                   return null;
-                }, controller: null,
+                },
+                controller: provider.gstController, // assign controller
               ),
-              Row(
+
+          Row(
                 children: [
                   Expanded(
                     child: customDropdown(
@@ -738,6 +774,7 @@ class _BillScreen extends State<BillScreen> {
                       onChanged: (value) {
                         setState(() {
                           gstPercentageOption = value;
+                          provider.gstPercentageController.text = value ?? ''; // fill controller with selected value
                         });
                       },
                       val: (value) {
@@ -745,7 +782,8 @@ class _BillScreen extends State<BillScreen> {
                           return 'Please select GST %';
                         }
                         return null;
-                      }, controller: null,
+                      },
+                      controller: provider.gstPercentageController, // assign controller
                     ),
                   ),
                   SizedBox(width: 10),
@@ -757,6 +795,7 @@ class _BillScreen extends State<BillScreen> {
                       onChanged: (value) {
                         setState(() {
                           gstTypeOption = value;
+                          provider.gstTypeController.text = value ?? ''; // update controller with selected value
                         });
                       },
                       val: (value) {
@@ -764,7 +803,8 @@ class _BillScreen extends State<BillScreen> {
                           return 'Please select GST Type';
                         }
                         return null;
-                      }, controller: null,
+                      },
+                      controller: provider.gstTypeController, // assign controller
                     ),
                   ),
                 ],
@@ -779,6 +819,7 @@ class _BillScreen extends State<BillScreen> {
                       onChanged: (value) {
                         setState(() {
                           reverseChargeOption = value;
+                          provider.reverseChargeController.text = value ?? ''; // update controller with selected value
                         });
                       },
                       val: (value) {
@@ -786,9 +827,11 @@ class _BillScreen extends State<BillScreen> {
                           return 'Please select Reverse Charge option';
                         }
                         return null;
-                      }, controller: null,
+                      },
+                      controller: provider.reverseChargeController, // assign controller
                     ),
                   ),
+
                   SizedBox(width: 10),
                   Expanded(
                     child: customDropdown(
@@ -798,6 +841,7 @@ class _BillScreen extends State<BillScreen> {
                       onChanged: (value) {
                         setState(() {
                           gstPaidByOption = value;
+                          provider.gstPaidByController.text = value ?? ''; // update controller with selected value
                         });
                       },
                       val: (value) {
@@ -805,7 +849,8 @@ class _BillScreen extends State<BillScreen> {
                           return 'Please select who pays GST';
                         }
                         return null;
-                      }, controller: null,
+                      },
+                      controller: provider.gstPaidByController, // assign controller
                     ),
                   ),
                 ],
@@ -838,6 +883,7 @@ class _BillScreen extends State<BillScreen> {
                 onChanged: (value) {
                   setState(() {
                     selectedInsuranceType = value;
+                    provider.insuranceTypeController.text = value ?? ''; // store selected value
                   });
                 },
                 val: (value) {
@@ -845,7 +891,8 @@ class _BillScreen extends State<BillScreen> {
                     return 'Please select an option';
                   }
                   return null;
-                }, controller: null,
+                },
+                controller: provider.insuranceTypeController, // assign controller
               ),
               Row(
                 children: [
@@ -858,6 +905,7 @@ class _BillScreen extends State<BillScreen> {
                       onChanged: (value) {
                         setState(() {
                           selectedInsuranceChargePercent = value;
+                          provider.insuranceChargePercentController.text = value ?? ''; // store selected value
                         });
                       },
                       val: (value) {
@@ -865,7 +913,8 @@ class _BillScreen extends State<BillScreen> {
                           return 'Please select an option';
                         }
                         return null;
-                      }, controller: null,
+                      },
+                      controller: provider.insuranceChargePercentController, // assign controller
                     ),
                   ),
                   SizedBox(width: 10),
@@ -878,6 +927,7 @@ class _BillScreen extends State<BillScreen> {
                       onChanged: (value) {
                         setState(() {
                           selectedGstValue = value;
+                          provider.gstValueController.text = value ?? ''; // store selected value
                         });
                       },
                       val: (value) {
@@ -885,7 +935,8 @@ class _BillScreen extends State<BillScreen> {
                           return 'Please select an option';
                         }
                         return null;
-                      }, controller: null,
+                      },
+                      controller: provider.gstValueController, // assign controller
                     ),
                   ),
                 ],
@@ -913,6 +964,7 @@ class _BillScreen extends State<BillScreen> {
                 onChanged: (value) {
                   setState(() {
                     selectedVehicleInsuranceType = value;
+                    provider.vehicleInsuranceTypeController.text = value ?? ''; // store selected value
                   });
                 },
                 val: (value) {
@@ -920,7 +972,8 @@ class _BillScreen extends State<BillScreen> {
                     return 'Please select an option';
                   }
                   return null;
-                }, controller: null,
+                },
+                controller: provider.vehicleInsuranceTypeController, // assign controller
               ),
               Row(
                 children: [
@@ -933,6 +986,7 @@ class _BillScreen extends State<BillScreen> {
                       onChanged: (value) {
                         setState(() {
                           selectedVehicleInsuranceChargePercent = value;
+                          provider.vehicleInsuranceChargePercentController.text = value ?? ''; // store selected value
                         });
                       },
                       val: (value) {
@@ -940,7 +994,8 @@ class _BillScreen extends State<BillScreen> {
                           return 'Please select an option';
                         }
                         return null;
-                      }, controller: null,
+                      },
+                      controller: provider.vehicleInsuranceChargePercentController, // assign controller
                     ),
                   ),
                   SizedBox(width: 10),
@@ -953,6 +1008,7 @@ class _BillScreen extends State<BillScreen> {
                       onChanged: (value) {
                         setState(() {
                           selectedVehicleGstValue = value;
+                          provider.vehicleGstValueController.text = value ?? ''; // store selected value
                         });
                       },
                       val: (value) {
@@ -960,7 +1016,8 @@ class _BillScreen extends State<BillScreen> {
                           return 'Please select an option';
                         }
                         return null;
-                      }, controller: null,
+                      },
+                      controller: provider.vehicleGstValueController, // assign controller
                     ),
                   ),
                 ],
@@ -975,8 +1032,6 @@ class _BillScreen extends State<BillScreen> {
         }
     );
   }
-
-
   Widget _expansionTileWrapper({required String title, required List<Widget> children}) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6.0),

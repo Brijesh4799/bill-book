@@ -1,12 +1,17 @@
 
+import 'dart:io';
+
 import 'package:BillBook/presentaion/homescreen_documents_pdf/quotation_pdf/get_byid_model/QuotationGetByIdModel.dart' hide ItemParticulars;
 import 'package:flutter/cupertino.dart';
+import 'package:path_provider/path_provider.dart';
+import '../../../homeScreen/quotationScreens/repo/quotation_repo.dart';
 import '../../Packing_list_pdf/get_by_id_model/packing_get_byid_model.dart';
 import '../get_byid_model/QuotationGetByIdModel.dart' hide ItemParticulars;
 import '../model/quotation_pdf_model.dart';
 import '../repo/quotation_pdf_repositroy.dart';
 class QuatationPdfProvider with ChangeNotifier {
   TextEditingController quotationNumberController = TextEditingController();
+  TextEditingController movingtypecontrooler = TextEditingController();
   TextEditingController companyNameController = TextEditingController();
   TextEditingController companyGSTController = TextEditingController();
   TextEditingController partyNameController = TextEditingController();
@@ -14,6 +19,7 @@ class QuatationPdfProvider with ChangeNotifier {
   TextEditingController quotationDateController = TextEditingController();
   TextEditingController packingDateController = TextEditingController();
   TextEditingController shiftingDateController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
 
   //Move From Country Controller
 
@@ -48,12 +54,14 @@ class QuatationPdfProvider with ChangeNotifier {
   TextEditingController octrioTaxController = TextEditingController();
   TextEditingController paymentRemarkController = TextEditingController();
   TextEditingController discountController = TextEditingController();
-  TextEditingController movingtypecontrooler = TextEditingController();
+  //TextEditingController movingtypecontrooler = TextEditingController();
   TextEditingController insurancetypecontroller = TextEditingController();
   TextEditingController InsuranceFOVcontroller = TextEditingController();
   TextEditingController insurancepergstController = TextEditingController();
   TextEditingController moveformfloorcontoller = TextEditingController();
   TextEditingController moveformliftcontoller = TextEditingController();
+  TextEditingController surchargeController = TextEditingController();
+  TextEditingController surchargeController2 = TextEditingController();
 
   //declarative vehical controller
 
@@ -86,20 +94,69 @@ class QuatationPdfProvider with ChangeNotifier {
 
   //QuotationGetDataByIdModel? quotationGetDataByIdModel;
   /// Fetch all quotations
-  Future<void> fetchQuatationListData() async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
+  // Future<void> fetchQuatationListData() async {
+  //   _isLoading = true;
+  //   _errorMessage = null;
+  //   notifyListeners();
+  //
+  //   try {
+  //     _quotationlist = await _quotationPdfRepository.getQuotationData();
+  //   } catch (e) {
+  //     _errorMessage = 'Failed to load quotation list: ${e.toString()}';
+  //   } finally {
+  //     _isLoading = false;
+  //     notifyListeners();
+  //   }
+  // }
 
-    try {
-      _quotationlist = await _quotationPdfRepository.getQuotationData();
-    } catch (e) {
-      _errorMessage = 'Failed to load quotation list: ${e.toString()}';
-    } finally {
-      _isLoading = false;
+
+  bool isLoading2 = false;
+  bool loading = false;
+  bool isLoadMoreRunning = false;
+  bool hasNextPage = true;
+  int page = 1;
+  void setLoading(bool loader) {
+    loading = loader;
+    notifyListeners();
+  }
+  Future<void> fetchQuatationListData({bool isLoadMore = false}) async {
+    if (!isLoadMore) {
+      page = 1;
+      hasNextPage = true;
+      _quotationlist = null;
+      setLoading(true);
+    } else {
+      if (isLoadMoreRunning || !hasNextPage) return;
+      isLoadMoreRunning = true;
       notifyListeners();
     }
+    try {
+      final response = await _quotationPdfRepository.getQuotationData(pageCount: page);
+      if (response.status == true &&
+          response.data != null &&
+          response.data!.isNotEmpty) {
+        if (isLoadMore) {
+          _quotationlist!.data!.addAll(response.data!);
+        } else {
+          _quotationlist = response;
+        }
+        page++;
+      } else {
+        hasNextPage = false;
+      }
+    } catch (e) {
+      print("Pagination Error: $e");
+      hasNextPage = false;
+    } finally {
+      if (!isLoadMore) {
+        setLoading(false);
+      } else {
+        isLoadMoreRunning = false;
+        notifyListeners();
+      }
+    }
   }
+
 
   /// Fetch quotation by ID
   Future<void> fetchQuotationById(String id) async {
@@ -152,6 +209,7 @@ class QuatationPdfProvider with ChangeNotifier {
             "companygstno": companyGSTController.text.trim(),
             "partyname": partyNameController.text.trim(),
             "email": emailController.text.trim(),
+            "phone": phoneController.text.trim(),
             "qtdate": quotationDateController.text.trim(),
             "shiptdate": shiftingDateController.text.trim(),
           },
@@ -188,6 +246,8 @@ class QuatationPdfProvider with ChangeNotifier {
             "miscellaneouscharge": miscChargesController.text.trim(),
             "othercharge": otherChargesController.text.trim(),
             "stcharge": stChargeController.text.trim(),
+            "surcharge": surchargeController.text.trim(),
+            "surchargevalue": surchargeController2.text.trim(),
             "octriogreentax": octrioTaxController.text.trim(),
             "remark": paymentRemarkController.text.trim(),
             "discount": discountController.text.trim(),
@@ -332,6 +392,7 @@ class QuatationPdfProvider with ChangeNotifier {
           companyGSTController.text = customer.companygstno ?? "";
           partyNameController.text = customer.partyname ?? "";
           emailController.text = customer.email ?? "";
+          phoneController.text = customer.phone ?? "";
           quotationDateController.text = customer.qtdate ?? "";
           shiftingDateController.text = customer.shiptdate ?? "";
 
@@ -447,7 +508,65 @@ class QuatationPdfProvider with ChangeNotifier {
     notifyListeners();
   }*/
 
-}
+  String? pdfLocalPath;
+  bool pdfLoading = false;
+  String? _errorMessage2;
+
+  String? get errorMessage2 => _errorMessage2;
+
+  Future<void> fetchQuotationPdf(String id) async {
+    pdfLoading = true;
+    _errorMessage2 = null;
+    notifyListeners();
+
+    try {
+      final responseBytes = await _quotationPdfRepository.quotationpdfApi(id);
+
+      if (responseBytes != null) {
+        // Save PDF in temporary directory
+        final dir = await getTemporaryDirectory();
+        final file = File('${dir.path}/quotation_$id.pdf');
+        await file.writeAsBytes(responseBytes);
+
+        pdfLocalPath = file.path;
+        print("✅ PDF saved at: $pdfLocalPath");
+      } else {
+        _errorMessage2 = "Empty PDF response";
+      }
+    } catch (e) {
+      _errorMessage2 = "Failed to fetch PDF: $e";
+      print(_errorMessage2);
+    } finally {
+      pdfLoading = false;
+      notifyListeners();
+    }
+  }
 
 
 
+  bool isLoading3 = false;
+  String? signatureLink;
+  String? errorMessage3;
+
+  /// Fetch signature link for a PDF
+  Future<void> fetchQuotationSignature(String pdfId, String pdfType) async {
+    isLoading3 = true;
+    signatureLink = null;
+    errorMessage3 = null;
+    notifyListeners();
+
+    try {
+      final link = await _quotationPdfRepository.quotationSignature(pdfId, pdfType);
+      signatureLink = link;
+      print("✅ Signature link: $signatureLink");
+    } catch (e) {
+      errorMessage3 = e.toString();
+      print("❌ Error fetching signature: $errorMessage");
+    } finally {
+      isLoading3 = false;
+      notifyListeners();
+    }
+  }
+
+
+  }

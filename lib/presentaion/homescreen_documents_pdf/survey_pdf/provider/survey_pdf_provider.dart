@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:path_provider/path_provider.dart';
 import '../get_byid_model/get_by_id_model.dart';
 import '../model/survey_pdf_model.dart' hide ItemParticulars;
 import '../repo/survey_repository.dart';
@@ -30,17 +33,65 @@ class SurveyPdfProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  Future<void> fetchSurveyListData() async {
-    _setLoading(true);
-    _errorMessage = null;
+  // Future<void> fetchSurveyListData() async {
+  //   _setLoading(true);
+  //   _errorMessage = null;
+  //
+  //   try {
+  //     _surveyList = await _repository.getsurveylistdataApi();
+  //   } catch (e) {
+  //     _errorMessage = 'Failed to load survey list: ${e.toString()}';
+  //   }
+  //
+  //   _setLoading(false);
+  // }
 
-    try {
-      _surveyList = await _repository.getsurveylistdataApi();
-    } catch (e) {
-      _errorMessage = 'Failed to load survey list: ${e.toString()}';
+
+  bool isLoading2 = false;
+  bool loading = false;
+  bool isLoadMoreRunning = false;
+  bool hasNextPage = true;
+  int page = 1;
+  void setLoading(bool loader) {
+    loading = loader;
+    notifyListeners();
+  }
+  Future<void> fetchSurveyListData({bool isLoadMore = false}) async {
+    if (!isLoadMore) {
+      page = 1;
+      hasNextPage = true;
+      _surveyList = null;
+      setLoading(true);
+    } else {
+      if (isLoadMoreRunning || !hasNextPage) return;
+      isLoadMoreRunning = true;
+      notifyListeners();
     }
-
-    _setLoading(false);
+    try {
+      final response = await _repository.getsurveylistdataApi(pageCount: page);
+      if (response.status == true &&
+          response.data != null &&
+          response.data!.isNotEmpty) {
+        if (isLoadMore) {
+          _surveyList!.data!.addAll(response.data!);
+        } else {
+          _surveyList = response;
+        }
+        page++;
+      } else {
+        hasNextPage = false;
+      }
+    } catch (e) {
+      print("Pagination Error: $e");
+      hasNextPage = false;
+    } finally {
+      if (!isLoadMore) {
+        setLoading(false);
+      } else {
+        isLoadMoreRunning = false;
+        notifyListeners();
+      }
+    }
   }
 
   Future<void> fetchSurveyPdf(String id) async {
@@ -192,5 +243,40 @@ class SurveyPdfProvider with ChangeNotifier {
     itemRemarkController.text = item.remark ?? "";
     notifyListeners();
   }
-  
+
+  String? pdfLocalPath;
+  bool pdfLoading = false;
+  String? _errorMessage2;
+
+  String? get errorMessage2 => _errorMessage2;
+
+  Future<void> fetchserveyPdf(String id) async {
+    pdfLoading = true;
+    _errorMessage2 = null;
+    notifyListeners();
+
+    try {
+      final responseBytes = await  _repository.serveypdfApi(id);
+
+      if (responseBytes != null) {
+        // Save PDF in temporary directory
+        final dir = await getTemporaryDirectory();
+        final file = File('${dir.path}/quotation_$id.pdf');
+        await file.writeAsBytes(responseBytes);
+
+        pdfLocalPath = file.path;
+        print("✅ PDF saved at: $pdfLocalPath");
+      } else {
+        _errorMessage2 = "Empty PDF response";
+      }
+    } catch (e) {
+      _errorMessage2 = "Failed to fetch PDF: $e";
+      print(_errorMessage2);
+    } finally {
+      pdfLoading = false;
+      notifyListeners();
+    }
+  }
+
+
 }

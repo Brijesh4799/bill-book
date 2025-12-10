@@ -1,6 +1,6 @@
 class LrBiltyPdfModel {
   bool? status;
-  String? message;
+  var message;
   List<Data>? data;
   Pagination? pagination;
 
@@ -35,13 +35,13 @@ class LrBiltyPdfModel {
 }
 
 class Data {
-  String? sId;
-  String? userId;
+  var sId;
+  var userId;
   FormData? formData;
-  String? status;
-  String? createdAt;
-  String? updatedAt;
-  int? iV;
+  var status;
+  var createdAt;
+  var updatedAt;
+  var iV;
 
   Data(
       {this.sId,
@@ -164,8 +164,8 @@ class FormData {
 }
 
 class LrDetails {
-  String? lrNumber;
-  String? lrDate;
+  var lrNumber;
+  var lrDate;
 
   LrDetails({this.lrNumber, this.lrDate});
 
@@ -183,12 +183,12 @@ class LrDetails {
 }
 
 class TruckVehicleDetails {
-  String? truckVehicleNumber;
-  String? truckVehicleMoveForm;
-  String? truckVehicleMoveTo;
-  String? truckVehicleDriverName;
-  String? truckVehicleDriverPhoneNumber;
-  String? truckVehicleDriverLicenceNumber;
+  var truckVehicleNumber;
+  var truckVehicleMoveForm;
+  var truckVehicleMoveTo;
+  var truckVehicleDriverName;
+  var truckVehicleDriverPhoneNumber;
+  var truckVehicleDriverLicenceNumber;
 
   TruckVehicleDetails(
       {this.truckVehicleNumber,
@@ -221,21 +221,21 @@ class TruckVehicleDetails {
 }
 
 class MoveFrom {
-  String? consignorName;
-  String? consignorPhone;
-  String? consignoraddress;
-  String? consignorcity;
-  String? consignorstate;
-  String? consignorpincode;
-  String? consignorgstNo;
-  String? consignorStateCode;
-  String? consignorCountry;
-  String? consignorAddress;
-  String? address;
-  String? city;
-  String? state;
-  String? pincode;
-  String? gstNo;
+  var consignorName;
+  var consignorPhone;
+  var consignoraddress;
+  var consignorcity;
+  var consignorstate;
+  var consignorpincode;
+  var consignorgstNo;
+  var consignorStateCode;
+  var consignorCountry;
+  var consignorAddress;
+  var address;
+  var city;
+  var state;
+  var pincode;
+  var gstNo;
 
   MoveFrom(
       {this.consignorName,
@@ -294,19 +294,19 @@ class MoveFrom {
 }
 
 class MoveTo {
-  String? consigneeName;
-  String? consigneePhone;
-  String? consigneeCountry;
-  String? consigneeaddress;
-  String? consigneecity;
-  String? consigneestate;
-  String? consigneepincode;
-  String? consigneegstNo;
-  String? address;
-  String? city;
-  String? state;
-  String? pincode;
-  String? gstNo;
+  var consigneeName;
+  var consigneePhone;
+  var consigneeCountry;
+  var consigneeaddress;
+  var consigneecity;
+  var consigneestate;
+  var consigneepincode;
+  var consigneegstNo;
+  var address;
+  var city;
+  var state;
+  var pincode;
+  var gstNo;
 
   MoveTo(
       {this.consigneeName,
@@ -359,15 +359,15 @@ class MoveTo {
 }
 
 class PackageDetails {
-  String? packageType;
-  String? packageNumber;
-  String? packageDescription;
-  String? packageActualWeight;
-  String? packageChangeWeight;
-  String? receivePackageCondition;
-  String? packageRemark;
+  var packageType;
+  var packageNumber;
+  var packageDescription;
+  var packageActualWeight;
+  var packageChangeWeight;
+  var receivePackageCondition;
+  var packageRemark;
   bool? allItemsInGoodCondition;
-  String? totalWeight;
+  var totalWeight;
 
   PackageDetails(
       {this.packageType,
@@ -408,20 +408,20 @@ class PackageDetails {
 }
 
 class PaymentDetails {
-  String? frightToBeBilled;
-  String? frightToPaid;
-  String? freightToPay;
-  String? totalBaseFreight;
-  String? loadingCharge;
-  String? unloadingCharge;
-  String? sTCharge;
-  String? otherCharge;
-  String? lRCNCharge;
-  String? paymentGst;
-  String? paymentGstPaidBy;
-  String? presentToBeBilled;
+  var frightToBeBilled;
+  var frightToPaid;
+  var freightToPay;
+  var totalBaseFreight;
+  var loadingCharge;
+  var unloadingCharge;
+  var sTCharge;
+  var otherCharge;
+  var lRCNCharge;
+  var paymentGst;
+  var paymentGstPaidBy;
+  var presentToBeBilled;
   bool? insurance;
-  String? insuranceAmount;
+  var insuranceAmount;
 
   PaymentDetails(
       {this.frightToBeBilled,
@@ -477,12 +477,12 @@ class PaymentDetails {
 }
 
 class MaterialInsurance {
-  String? materialInsurance;
-  String? insuranceCompany;
-  String? policyNumber;
-  String? insuranceDate;
-  String? insuranceAmount;
-  String? insuranceRisk;
+  var materialInsurance;
+  var insuranceCompany;
+  var policyNumber;
+  var insuranceDate;
+  var insuranceAmount;
+  var insuranceRisk;
 
   MaterialInsurance(
       {this.materialInsurance,
@@ -515,8 +515,8 @@ class MaterialInsurance {
 
 class DemurrageCharge {
   bool? demurrageChargeApplicable;
-  String? chargePerDay;
-  String? moreThanDays;
+  var chargePerDay;
+  var moreThanDays;
 
   DemurrageCharge(
       {this.demurrageChargeApplicable, this.chargePerDay, this.moreThanDays});
@@ -537,13 +537,13 @@ class DemurrageCharge {
 }
 
 class InvoiceEWayBill {
-  String? goodValue;
-  String? invoicebill;
-  String? invoiceDate;
-  String? eWayBillNumber;
-  String? eWayBillGenerateDate;
-  String? eWayBillExpireDate;
-  String? eWayBillExtendedPeriod;
+  var goodValue;
+  var invoicebill;
+  var invoiceDate;
+  var eWayBillNumber;
+  var eWayBillGenerateDate;
+  var eWayBillExpireDate;
+  var eWayBillExtendedPeriod;
 
   InvoiceEWayBill(
       {this.goodValue,
@@ -578,10 +578,10 @@ class InvoiceEWayBill {
 }
 
 class Pagination {
-  int? total;
-  int? page;
-  int? limit;
-  int? totalPages;
+  var total;
+  var page;
+  var limit;
+  var totalPages;
 
   Pagination({this.total, this.page, this.limit, this.totalPages});
 

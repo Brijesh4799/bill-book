@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../repo/proforma_invoice_repository.dart';
 
@@ -146,6 +147,7 @@ class ProformaInvoiceProvider with ChangeNotifier{
   TextEditingController moveFromController = TextEditingController();
   TextEditingController moveToControllerr = TextEditingController();
   TextEditingController vehicleNumberController = TextEditingController();
+  TextEditingController gstShowHideController = TextEditingController();
 
   //bill Details
 
@@ -157,6 +159,7 @@ class ProformaInvoiceProvider with ChangeNotifier{
   TextEditingController billToCityController = TextEditingController();
   TextEditingController billToPincodeController = TextEditingController();
   TextEditingController billToAddressController = TextEditingController();
+  TextEditingController gstTypeController = TextEditingController();
 
   //Consignor Name
 
@@ -179,6 +182,7 @@ class ProformaInvoiceProvider with ChangeNotifier{
   TextEditingController consigneeCityController = TextEditingController();
   TextEditingController consigneePincodeController = TextEditingController();
   TextEditingController consigneeAddressController = TextEditingController();
+  TextEditingController gstPercentageController = TextEditingController();
 
   //Package Details
 
@@ -207,6 +211,8 @@ class ProformaInvoiceProvider with ChangeNotifier{
   TextEditingController paymentRemarkController = TextEditingController();
   TextEditingController discountController = TextEditingController();
   TextEditingController declarationGoodsValueController = TextEditingController();
+  TextEditingController reverseChargeController = TextEditingController();
+  TextEditingController gstPaidByController = TextEditingController();
 
 
   //InsuranceDetailsTile
@@ -226,8 +232,8 @@ class ProformaInvoiceProvider with ChangeNotifier{
             "preDeliveryDate": deliveryDateController.text.trim(),
             "preGst": "", // Add GST if available
             "Shipment": shipmentTypeController.text.trim(),
-            "gstShow": "yes", // Hardcoded or bind to a switch
-            "typeShipment": "", // Add if different from Shipment
+            "gstShow": gstShowHideController.text.trim(), // Hardcoded or bind to a switch
+            "typeShipment": shipmentTypeController.text.trim(), // Add if different from Shipment
             "movingPathRemark": movingPathRemarkController.text.trim(),
             "moveFrom": moveFromController.text.trim(),
             "moveto": moveToControllerr.text.trim(),
@@ -268,7 +274,7 @@ class ProformaInvoiceProvider with ChangeNotifier{
             "packageType": packageController.text.trim(),
             "description": descriptionController.text.trim(),
             "totalWeightUnit": totalWeightController.text.trim(),
-            "totalWeight": "", // If needed separately from unit
+            "totalWeight": totalWeightController.text.trim(), // If needed separately from unit
             "hsnCode": receiveConditionController.text.trim(),
             "detailsremark": remarkController.text.trim(),
           },
@@ -289,11 +295,11 @@ class ProformaInvoiceProvider with ChangeNotifier{
             "surcharge": surchargeController.text.trim(),
             "paymentRemark": paymentRemarkController.text.trim(),
             "paymentDiscount": discountController.text.trim(),
-            "gstShow": "hide",
-            "paymentGstNo": "", // If available
-            "paymentGstType": "", // e.g., "cgst"
-            "reverseCharge": "",
-            "gstPaidBy": "",
+            "gstShow": gstShowHideController.text.trim(),
+            "paymentGstNo": gstPercentageController.text.trim(), // If available
+            "paymentGstType": gstTypeController.text.trim(), // e.g., "cgst"
+            "reverseCharge": reverseChargeController.text.trim(),
+            "gstPaidBy": gstPaidByController.text.trim(),
             "paymentMode": "Bank Transfer", // if available in your UI
           },
           "insuranceDetails": {

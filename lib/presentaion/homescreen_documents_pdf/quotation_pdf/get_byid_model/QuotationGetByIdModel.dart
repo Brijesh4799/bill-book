@@ -152,6 +152,7 @@ class QuotationDetails {
   String? companygstno;
   String? partyname;
   String? email;
+  String? phone;
   String? qtdate;
   String? shiptdate;
 
@@ -163,6 +164,7 @@ class QuotationDetails {
         this.companygstno,
         this.partyname,
         this.email,
+        this.phone,
         this.qtdate,
         this.shiptdate});
 
@@ -174,6 +176,7 @@ class QuotationDetails {
     companygstno = json['companygstno'];
     partyname = json['partyname'];
     email = json['email'];
+    phone = json['phone'];
     qtdate = json['qtdate'];
     shiptdate = json['shiptdate'];
   }
@@ -187,6 +190,7 @@ class QuotationDetails {
     data['companygstno'] = this.companygstno;
     data['partyname'] = this.partyname;
     data['email'] = this.email;
+    data['phone'] = this.email;
     data['qtdate'] = this.qtdate;
     data['shiptdate'] = this.shiptdate;
     return data;

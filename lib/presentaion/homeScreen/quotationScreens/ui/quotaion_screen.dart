@@ -10,25 +10,17 @@ import '../../../../core/widgets/custom_dropDownWithInputText.dart';
 import '../../../../core/widgets/custom_input_text_field.dart';
 import '../../home_controller.dart';
 import '../provider/QuotationProvider.dart';
-
 class QuotationScreen extends StatefulWidget {
   final String mobileNumber;
   final QuotationPdfModel? quotationData;
-
-
-  //const QuotationScreen({super.key});
   const QuotationScreen({Key? key, required this.mobileNumber, this.quotationData}) : super(key: key);
-
   @override
   _QuotationScreenState createState() => _QuotationScreenState();
 }
-
 class _QuotationScreenState extends State<QuotationScreen> {
-  // Controllers for Quotation Details
   final TextEditingController quotationNumberController =
       TextEditingController();
    TextEditingController companyNameController = TextEditingController();
-// TextEditingController companyGSTController = TextEditingController();
   TextEditingController partyNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController quotationDateController = TextEditingController();
@@ -40,12 +32,11 @@ class _QuotationScreenState extends State<QuotationScreen> {
   TextEditingController itemRemarkController = TextEditingController();
   TextEditingController itemCFTController = TextEditingController();
   TextEditingController itemBoxNumberController = TextEditingController();
+  TextEditingController surchargeController = TextEditingController();
+  TextEditingController surchargeController2 = TextEditingController();
 
-  String? selectedGstPercent; // for GST%
-  String? selectedGstType;    // for GST TYPE
-
-
-  // Dropdown selected value
+  String? selectedGstPercent;
+  String? selectedGstType;
   String? selectedQutationDetailsDropDownValue;
   List<String> QuotaionDetaildropdownItems = [
     'Local',
@@ -69,16 +60,11 @@ class _QuotationScreenState extends State<QuotationScreen> {
       TextEditingController();
   final TextEditingController moveFromAddressController =
       TextEditingController();
-
-  // Dropdowns
   String? selectedFromFloor;
   String? selectedFromLiftAvailable;
-
-
   List<String> floorOptions = [];
   List<String> liftOptions = ['Yes', 'No'];
 
-  // Controllers for Move To section
   final TextEditingController moveToCountryController = TextEditingController();
   final TextEditingController moveToStateController = TextEditingController();
   final TextEditingController moveToCityController = TextEditingController();
@@ -100,11 +86,10 @@ class _QuotationScreenState extends State<QuotationScreen> {
   final TextEditingController insurancetypecontroller = TextEditingController();
   final TextEditingController vehicalinsurencecontoller = TextEditingController();
   final TextEditingController InsuranceFOVcontroller = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
 
-  // Dropdowns
   String? selectedToFloor;
   String? selectedToLiftAvailable;
-
   String? packingChargeOption;
   String? unpackingChargeOption;
   String? loadingChargeOption;
@@ -114,7 +99,6 @@ class _QuotationScreenState extends State<QuotationScreen> {
   String? surchargeOption2;
   String? gstOption;
 
-  // Common dropdown items
   final List<String> chargeOptions = [
     'Included in Freight',
     'Extra',
@@ -129,27 +113,17 @@ class _QuotationScreenState extends State<QuotationScreen> {
     'GST CHARGE HIDE IN QUOTATION',
   ];
 
-
-
   String? selectedInsuranceType;
   String? selectedGst;
   String? selectedInsuranceChargeValue;
   String? selectedGstValue;
-
-
-
   String? selectedVehicleInsuranceType;
   String? selectedVehicleInsuranceCharge;
   String? selectedVehicleInsuranceGst;
-
  TextEditingController gotDownItemsController = TextEditingController();
-
   String? selectedAccessLoadUnload;
   String? selectedLoadingRestrictions;
-
   List<ListItem> particularItemsDetails = [];
-
-
   @override
   void initState() {
     super.initState();
@@ -161,7 +135,6 @@ class _QuotationScreenState extends State<QuotationScreen> {
   }
   List<String> generateFloorOptions(int maxFloor) {
     List<String> floorOptions = ['Ground'];
-
     for (int i = 1; i <= maxFloor; i++) {
       String suffix;
       if (i % 10 == 1 && i % 100 != 11) {
@@ -175,7 +148,6 @@ class _QuotationScreenState extends State<QuotationScreen> {
       }
       floorOptions.add('$i$suffix');
     }
-
     return floorOptions;
   }
 
@@ -199,16 +171,12 @@ class _QuotationScreenState extends State<QuotationScreen> {
               _buildVehicleInsuranceTile(),
               _buildOtherDetailsTile(),
               _buildItemDetailsTile(),
-
-
               const SizedBox(height: 80),
             ],
           ),
         );
       }
       ),
-
-
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(12.0),
@@ -218,19 +186,16 @@ class _QuotationScreenState extends State<QuotationScreen> {
                 onPressed: () async {
                   HelperFunctions helper = HelperFunctions();
                   bool isConnected = await helper.isConnected();
-
                   if (!isConnected) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('No internet connection')),
                     );
                     return;
                   }
-
                   await provider.quotationdetails(
                     mobileNumber: widget.mobileNumber,
                     context: context,
                   );
-
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => HomeNavController()),
@@ -252,9 +217,6 @@ class _QuotationScreenState extends State<QuotationScreen> {
           ),
         ),
       ),
-
-
-
     );
   }
   Widget _buildQuotationDetailsTile() {
@@ -268,33 +230,17 @@ class _QuotationScreenState extends State<QuotationScreen> {
               label: 'Quotation Number (कोटेशन नंबर)',
               textEditingController: provider.quotationNumberController,
             ),
-
-
-        /*customDropdown(
-        label: 'Moving Type (मूविंग के प्रकार)',
-        items: QuotaionDetaildropdownItems,
-        selectedItem: provider.selectedMovingType,
-        onChanged: (value) {
-        provider.setMovingType(value);
-        },
-        val: (value) => provider.validateMovingType(value),
-          controller: movingtypecontrooler,
-        ),*/
             customDropdown(
               label: 'Moving Type (मूविंग के प्रकार)',
               items: QuotaionDetaildropdownItems,
               selectedItem: provider.selectedMovingType,
-              controller: movingtypecontrooler, // ✅ will store selected value
+              controller: provider.movingtypecontrooler,
               onChanged: (value) {
                 provider.setMovingType(value);
-
-                // ✅ also update controller so you can send later in formData
-                movingtypecontrooler.text = value ?? '';
+                provider.movingtypecontrooler.text = value ?? '';
               },
               val: (value) => provider.validateMovingType(value),
             ),
-
-
             inputTextFields(
               label: 'Company Name Of Party (कंपनी नाम - जिसमें कोटेशन चाहिए)',
               textEditingController: provider.companyNameController,
@@ -312,6 +258,12 @@ class _QuotationScreenState extends State<QuotationScreen> {
               label: 'Email (ईमेल)',
               inputType: TextInputType.emailAddress,
               textEditingController: provider.emailController,
+            ),
+            inputTextFields(
+              label: 'PHONE* (फोन)',
+              inputType: TextInputType.phone,
+              maxLength: 10,
+              textEditingController: provider.phoneController,
             ),
             Row(
               children: [
@@ -387,9 +339,6 @@ class _QuotationScreenState extends State<QuotationScreen> {
       },
     );
   }
-
-
-
   Widget _buildMoveFromTile(){
     return Consumer<QuatationProvider>(
         builder: (context, provider, child){
@@ -440,13 +389,15 @@ class _QuotationScreenState extends State<QuotationScreen> {
                           selectedItem: provider.selectedFromFloor,
                           onChanged: (value) {
                             provider.setFromFloor(value);
+                            provider.moveformfloorcontoller.text = value ?? '';
                           },
                           val: provider.validateDropdown,
-                          controller: moveformfloorcontoller,
+                          controller: provider.moveformfloorcontoller,
                         );
                       },
                     ),
                   ),
+
                   SizedBox(width: 10),
                   Expanded(
                     child: Consumer<QuatationProvider>(
@@ -457,23 +408,21 @@ class _QuotationScreenState extends State<QuotationScreen> {
                           selectedItem: provider.selectedFromLiftAvailable,
                           onChanged: (value) {
                             provider.setFromLiftAvailable(value);
+                            provider.moveformliftcontoller.text = value ?? '';
                           },
                           val: provider.validateDropdown,
-                          controller: moveformliftcontoller,
+                          controller: provider.moveformliftcontoller,
                         );
                       },
                     ),
                   ),
                 ],
               ),
-
-
             ],
           );
         }
     );
   }
-
 
   Widget _buildMoveToTile(){
     return Consumer<QuatationProvider>(
@@ -524,9 +473,10 @@ class _QuotationScreenState extends State<QuotationScreen> {
                           selectedItem: provider.selectedToFloor,
                           onChanged: (value) {
                             provider.setToFloor(value);
+                            provider.movetocontroller.text = value ?? '';
                           },
-                          val: provider.validateDropdown, 
-                          controller: movetocontroller,
+                          val: provider.validateDropdown,
+                          controller: provider.movetocontroller,
                         );
                       },
                     ),
@@ -541,340 +491,379 @@ class _QuotationScreenState extends State<QuotationScreen> {
                           selectedItem: provider.selectedToLiftAvailable,
                           onChanged: (value) {
                             provider.setToLiftAvailable(value);
+                            provider.movetoliftcontoller.text = value ?? '';
                           },
-                          val: provider.validateDropdown, 
-                          controller: movetoliftcontoller,
+                          val: provider.validateDropdown,
+                          controller: provider.movetoliftcontoller,
                         );
                       },
                     ),
                   ),
                 ],
               ),
-
-
             ],
           );
         }
     );
   }
 
-  Widget _buildPaymentDetailsTile(){
+  Widget _buildPaymentDetailsTile() {
     return Consumer<QuatationProvider>(
-        builder: (context, provider, child){
-          return  _expansionTileWrapper(
-            title: 'Payment Details(पेमेंट का विवरण)',
-            children: [
-              inputTextFields(
-                label: 'FREIGHT CHARGE',
-                hintText: '0',
-                inputType: TextInputType.number,
-                textEditingController: provider.freightChargeController,
-              ),
-              inputTextFields(
-                label: 'ADVANCE PAID',
-                hintText: '0',
-                inputType: TextInputType.number,
-                textEditingController: provider.advancePaidController,
-              ),
-
-
-              DropdownWithInputField(
+      builder: (context, provider, child) {
+        return _expansionTileWrapper(
+          title: 'Payment Details(पेमेंट का विवरण)',
+          children: [
+            inputTextFields(
+              label: 'FREIGHT CHARGE',
+              hintText: '0',
+              inputType: TextInputType.number,
+              textEditingController: provider.freightChargeController,
+            ),
+            inputTextFields(
+              label: 'ADVANCE PAID',
+              hintText: '0',
+              inputType: TextInputType.number,
+              textEditingController: provider.advancePaidController,
+            ),
+            DropdownWithInputField(
               dropdownValue: provider.selectedPackingChargeOption,
-          onDropdownChanged: (val) {
-          provider.setPackingChargeOption(val);
-          },
-          dropdownItems: chargeOptions,
-          controller: provider.packingChargeController,
-          hintText: '0',
-          labelText: 'PACKING CHARGE',
-          ),
-
-              DropdownWithInputField(
-                dropdownValue: provider.unpackingChargeOption,
-                onDropdownChanged: (val) {
-                  provider.setUnpackingChargeOption(val!);
-                },
-                dropdownItems: chargeOptions,
-                controller: provider.unpackingChargeController,
-                hintText: '0',
-                labelText: 'UNPACKING CHARGE',
-              ),
-
-              DropdownWithInputField(
-                dropdownValue: provider.loadingChargeOption,
-                onDropdownChanged: (val) {
-                  provider.setLoadingChargeOption(val!);
-                },
-                dropdownItems: chargeOptions,
-                controller: provider.loadingChargeController,
-                hintText: '0',
-                labelText: 'LOADING CHARGE',
-              ),
-
-              DropdownWithInputField(
-                dropdownValue: provider.unloadingChargeOption,
-                onDropdownChanged: (val) {
-                  provider.setUnloadingChargeOption(val!);
-                },
-                dropdownItems: chargeOptions,
-                controller: provider.unloadingChargeController,
-                hintText: '0',
-                labelText: 'UNLOADING CHARGE',
-              ),
-
-              DropdownWithInputField(
-                dropdownValue: provider.packingMaterialChargeOption,
-                onDropdownChanged: (val) {
-                  provider.setPackingMaterialChargeOption(val!);
-                },
-                dropdownItems: chargeOptions,
-                controller: provider.packingMaterialChargeController,
-                hintText: '0',
-                labelText: 'PACKING MATERIAL CHARGE',
-              ),
-
-
-              Row(
-                children: [
-                  Expanded(
-                    child: inputTextFields(
-                      label: 'STORAGE CHARGE',
-                      hintText: '0',
-                      inputType: TextInputType.number,
-                      textEditingController: provider.storageChargeController,
-                    ),
+              onDropdownChanged: (val) {
+                provider.setPackingChargeOption(val);
+                if (val == "Extra") {
+                  provider.packingChargeController.clear();
+                } else {
+                  provider.packingChargeController.text = val ?? '';
+                }
+              },
+              dropdownItems: chargeOptions,
+              controller: provider.packingChargeController,
+              hintText: '0',
+              labelText: 'PACKING CHARGE',
+            ),
+            DropdownWithInputField(
+              dropdownValue: provider.unpackingChargeOption,
+              onDropdownChanged: (val) {
+                provider.setUnpackingChargeOption(val!);
+                if (val == "Extra") {
+                  provider.unpackingChargeController.clear();
+                } else {
+                  provider.unpackingChargeController.text = val;
+                }
+              },
+              dropdownItems: chargeOptions,
+              controller: provider.unpackingChargeController,
+              hintText: '0',
+              labelText: 'UNPACKING CHARGE',
+            ),
+            DropdownWithInputField(
+              dropdownValue: provider.loadingChargeOption,
+              onDropdownChanged: (val) {
+                provider.setLoadingChargeOption(val!);
+                if (val == "Extra") {
+                  provider.loadingChargeController.clear();
+                } else {
+                  provider.loadingChargeController.text = val ?? '';
+                }
+              },
+              dropdownItems: chargeOptions,
+              controller: provider.loadingChargeController,
+              hintText: '0',
+              labelText: 'LOADING CHARGE',
+            ),
+            DropdownWithInputField(
+              dropdownValue: provider.unloadingChargeOption,
+              onDropdownChanged: (val) {
+                provider.setUnloadingChargeOption(val!);
+                if (val == "Extra") {
+                  provider.unloadingChargeController.clear();
+                } else {
+                  provider.unloadingChargeController.text = val ?? '';
+                }
+              },
+              dropdownItems: chargeOptions,
+              controller: provider.unloadingChargeController,
+              hintText: '0',
+              labelText: 'UNLOADING CHARGE',
+            ),
+            DropdownWithInputField(
+              dropdownValue: provider.packingMaterialChargeOption,
+              onDropdownChanged: (val) {
+                provider.setPackingMaterialChargeOption(val!);
+                if (val == "Extra") {
+                  provider.packingMaterialChargeController.clear();
+                } else {
+                  provider.packingMaterialChargeController.text = val ?? '';
+                }
+              },
+              dropdownItems: chargeOptions,
+              controller: provider.packingMaterialChargeController,
+              hintText: '0',
+              labelText: 'PACKING MATERIAL CHARGE',
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: inputTextFields(
+                    label: 'STORAGE CHARGE',
+                    hintText: '0',
+                    inputType: TextInputType.number,
+                    textEditingController: provider.storageChargeController,
                   ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: inputTextFields(
-                      label: 'CAR/BIKE TPT',
-                      inputType: TextInputType.number,
-                      hintText: '0',
-                      textEditingController: provider.carBikeTptController,
-                    ),
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: inputTextFields(
+                    label: 'CAR/BIKE TPT',
+                    hintText: '0',
+                    inputType: TextInputType.number,
+                    textEditingController: provider.carBikeTptController,
                   ),
-                ],
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: inputTextFields(
-                      label: 'MISCELLANEOUS CHARGES',
-                      hintText: '0',
-                      inputType: TextInputType.number,
-                      textEditingController: provider.miscChargesController,
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: inputTextFields(
-                      label: 'OTHER CHARGES',
-                      hintText: '0',
-                      inputType: TextInputType.number,
-                      textEditingController: provider.otherChargesController,
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: inputTextFields(
-                      label: 'S.T. CHARGE',
-                      hintText: '0',
-                      inputType: TextInputType.number,
-                      textEditingController: provider.stChargeController,
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: inputTextFields(
-                      label: 'OCTRIO GREEN TAX',
-                      hintText: '0',
-                      inputType: TextInputType.number,
-                      textEditingController: provider.octrioTaxController,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
+            ),
 
-              DropdownWithInputField2(
-                dropdownValue: surchargeOption,
-                dropdownValue2: surchargeOption2,
+            Row(
+              children: [
+                Expanded(
+                  child: inputTextFields(
+                    label: 'MISCELLANEOUS CHARGES',
+                    hintText: '0',
+                    inputType: TextInputType.number,
+                    textEditingController: provider.miscChargesController,
+                  ),
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: inputTextFields(
+                    label: 'OTHER CHARGES',
+                    hintText: '0',
+                    inputType: TextInputType.number,
+                    textEditingController: provider.otherChargesController,
+                  ),
+                ),
+              ],
+            ),
 
-                onDropdownChanged: (val) {
-                  setState(() {
-                    surchargeOption = val;
-                  });
-                }, onDropdownChanged2: (val) {
+            Row(
+              children: [
+                Expanded(
+                  child: inputTextFields(
+                    label: 'S.T. CHARGE',
+                    hintText: '0',
+                    inputType: TextInputType.number,
+                    textEditingController: provider.stChargeController,
+                  ),
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: inputTextFields(
+                    label: 'OCTRIO GREEN TAX',
+                    hintText: '0',
+                    inputType: TextInputType.number,
+                    textEditingController: provider.octrioTaxController,
+                  ),
+                ),
+              ],
+            ),
+            DropdownWithInputField2(
+              dropdownValue: surchargeOption,
+              dropdownValue2: surchargeOption2,
+              onDropdownChanged: (val) {
                 setState(() {
-                  surchargeOption2 = val;
+                  surchargeOption = val;
+                  provider.surchargeController.text = val ?? '';
                 });
               },
-                dropdownItems: chargeOptions,
-                dropdownItems2: chargeOptions2,
-                 //controller: surchargeController,
-                // hintText: '0',
-                labelText: 'SURCHARGE',
-              ),
+              onDropdownChanged2: (val) {
+                setState(() {
+                  surchargeOption2 = val;
+                  provider.surchargeController2.text = val ?? '';
+                });
+              },
+              dropdownItems: chargeOptions,
+              dropdownItems2: chargeOptions2,
+              controller: provider.surchargeController,
+              controller2: provider.surchargeController2,
+              labelText: 'SURCHARGE',
+            ),
+            customDropdown(
+              label: 'GST SHOW/HIDE GST',
+              items: gstOptions,
+              selectedItem: gstOption,
+              onChanged: (value) {
+                setState(() {
+                  gstOption = value;
+                  gstshowingcontoller.text = value ?? '';
+                });
+              },
+              val: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please select an option';
+                }
+                return null;
+              },
+              controller: gstshowingcontoller,
+            ),
 
-
-
-              customDropdown(
-                label: 'GST SHOW/HIDE GST',
-                items: gstOptions,
-                selectedItem: gstOption,
-                onChanged: (value) {
-                  setState(() {
-                    gstOption = value;
-                  });
-                },
-                val: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select an option';
-                  }
-                  return null;
-                }, 
-                controller: gstshowingcontoller,
-              ),
-
-              Row(
-                children: [
-                  Expanded(
-                    flex: 1,
-                    child: customDropdown(
-                      label: 'GST%',
-                      items: ['0%', '5%', '12%', '18%', '28%'],
-                      selectedItem: selectedGstPercent,
-                      onChanged: (value) {
-                        setState(() {
-                          selectedGstPercent = value;
-                        });
-                      },
-                      val: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please select an option';
-                        }
-                        return null;
-                      }, controller: gtspershowingcontolller,
-                    ),
+            Row(
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: Consumer<QuatationProvider>(
+                    builder: (context, provider, child) {
+                      return customDropdown(
+                        label: 'GST%',
+                        items: ['0%', '5%', '12%', '18%', '28%'],
+                        selectedItem: provider.selectedGstPercent,
+                        onChanged: (value) {
+                          provider.setGstPercent(value);
+                          provider.gtspershowingcontolller.text = value ?? ''; // ✅ update controller
+                        },
+                        val: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please select an option';
+                          }
+                          return null;
+                        },
+                        controller: provider.gtspershowingcontolller,
+                      );
+                    },
                   ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    flex: 2,
-                    child: customDropdown(
-                      label: 'GST TYPE',
-                      items: ['CGST/SGST', 'CGST/UTGST', 'IGST'],
-                      selectedItem: selectedGstType,
-                      onChanged: (value) {
-                        setState(() {
-                          selectedGstType = value;
-                        });
-                      },
-                      val: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please select an option';
-                        }
-                        return null;
-                      }, controller: gsttypecontroller,
-                    ),
+                ),
+
+                SizedBox(width: 10),
+
+                Expanded(
+                  flex: 2,
+                  child: Consumer<QuatationProvider>(
+                    builder: (context, provider, child) {
+                      return customDropdown(
+                        label: 'GST TYPE',
+                        items: ['CGST/SGST', 'CGST/UTGST', 'IGST'],
+                        selectedItem: provider.selectedGstType, // use provider value
+                        onChanged: (value) {
+                          provider.setGstType(value); // update provider
+                          provider.gsttypecontroller.text = value ?? ''; // also update controller
+                        },
+                        val: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please select an option';
+                          }
+                          return null;
+                        },
+                        controller: provider.gsttypecontroller,
+                      );
+                    },
                   ),
-                ],
-              ),
+                ),
+              ],
+            ),
 
-              inputTextFields(
-                label: 'REMARK (टिप्पड़ी)',
-                textEditingController: provider.paymentRemarkController,
-              ),
-              inputTextFields(
-                label: 'DISCOUNT(डिस्काउंट)-Applicable on Sub-Total Amount',
+            inputTextFields(
+              label: 'REMARK (टिप्पड़ी)',
+              textEditingController: provider.paymentRemarkController,
+            ),
 
-                textEditingController: provider.discountController,
-              ),
-            ],
-          );
-        }
+            inputTextFields(
+              label: 'DISCOUNT(डिस्काउंट)-Applicable on Sub-Total Amount',
+              hintText: '0',
+              inputType: TextInputType.number,
+              textEditingController: provider.discountController,
+            ),
+          ],
+        );
+      },
     );
   }
 
-  Widget _buildInsuranceFOVTile(){
+  Widget _buildInsuranceFOVTile() {
     return Consumer<QuatationProvider>(
-        builder: (context, provider, child){
-          return  _expansionTileWrapper(
-            title: 'Insurance (FOV) Details (बीमा की जानकारी)',
-            children: [
-              customDropdown(
-                label: 'INSURANCE TYPE',
-                items: [ 'Not Applicable','Optional','Show Insurance Amount','Included in Freight'],
-                selectedItem: selectedInsuranceType,
-                onChanged: (value) {
-                  setState(() {
-                    selectedInsuranceType = value;
-                  });
-                },
-                val: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select an option';
-                  }
-                  return null;
-                }, controller:insurancetypecontroller,
-              ),
-              Row(
-                crossAxisAlignment:CrossAxisAlignment.end,
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: customDropdown(
-                      label: 'INSURANCE CHARGE @PERCENTAGE(%)',
-                      items: ['1%', '2%', '3%', '4%', '5%'],
-                      selectedItem: selectedInsuranceChargeValue,
-                      onChanged: (value) {
-                        setState(() {
-                          selectedInsuranceChargeValue = value;
-                        });
-                      },
-                      val: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please select an option';
-                        }
-                        return null;
-                      }, controller: insurancepergstController,
-                    ),
+      builder: (context, provider, child) {
+        return _expansionTileWrapper(
+          title: 'Insurance (FOV) Details (बीमा की जानकारी)',
+          children: [
+            customDropdown(
+              label: 'INSURANCE TYPE',
+              items: ['Not Applicable', 'Optional', 'Show Insurance Amount', 'Included in Freight'],
+              selectedItem: selectedInsuranceType,
+              onChanged: (value) {
+                setState(() {
+                  selectedInsuranceType = value;
+                  insurancetypecontroller.text = value ?? '';
+                });
+              },
+              val: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please select an option';
+                }
+                return null;
+              },
+              controller: provider.insurancetypecontroller,
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: Consumer<QuatationProvider>(
+                    builder: (context, provider, child) {
+                      return customDropdown(
+                        label: 'INSURANCE CHARGE @PERCENTAGE(%)',
+                        items: ['1%', '2%', '3%', '4%', '5%'],
+                        selectedItem: provider.selectedInsuranceChargeValue, // use provider
+                        onChanged: (value) {
+                          provider.setInsuranceChargeValue(value); // update provider
+                          provider.insurancepergstController.text = value ?? ''; // also update controller
+                        },
+                        val: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please select an option';
+                          }
+                          return null;
+                        },
+                        controller: provider.insurancepergstController,
+                      );
+                    },
                   ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    flex: 1,
-                    child: customDropdown(
-                      label: 'GST%',
-                      items: ['0', '1', '2', '3', '4', '5'],
-                      selectedItem: selectedGstValue,
-                      onChanged: (value) {
-                        setState(() {
-                          selectedGstValue = value;
-                        });
-                      },
-                      val: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please select an option';
-                        }
-                        return null;
-                      }, controller: InsuranceFOVcontroller,
-                    ),
-                  ),
-                ],
-              ),
-              inputTextFields(
-                label: 'DECLARATION VALUE OF VEHICLE(if any)',
-                textEditingController: provider.declarationVehicleValueController,
-              ),
-            ],
-          );
+                ),
 
-        }
+                SizedBox(width: 10),
+                Expanded(
+                  flex: 1,
+                  child: Consumer<QuatationProvider>(
+                    builder: (context, provider, child) {
+                      return customDropdown(
+                        label: 'GST%',
+                        items: ['0', '1', '2', '3', '4', '5'],
+                        selectedItem: provider.selectedInsuranceFOVGst,
+                        onChanged: (value) {
+                          provider.setInsuranceFOVGst(value);
+                          provider.InsuranceFOVcontroller.text = value ?? '';
+                        },
+                        val: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please select an option';
+                          }
+                          return null;
+                        },
+                        controller: provider.InsuranceFOVcontroller,
+                      );
+                    },
+                  ),
+                ),
+
+              ],
+            ),
+            inputTextFields(
+              label: 'DECLARATION VALUE OF VEHICLE(if any)',
+              textEditingController: provider.declarationVehicleValueController,
+            ),
+          ],
+        );
+      },
     );
   }
-
-  Widget _buildVehicleInsuranceTile(){
+ Widget _buildVehicleInsuranceTile(){
     return Consumer<QuatationProvider>(
         builder: (context, provider, child){
           return _expansionTileWrapper(
@@ -939,26 +928,6 @@ class _QuotationScreenState extends State<QuotationScreen> {
                       },
                     ),
                   ),
-                 /* Expanded(
-                    flex: 1,
-                    child: customDropdown(
-                      controller: stateController,
-                      label: 'GST%',
-                      items: ['0', '5', '12', '18', '28'],
-                      selectedItem: selectedVehicleInsuranceGst,
-                      onChanged: (value) {
-                        setState(() {
-                          selectedVehicleInsuranceGst = value;
-                        });
-                      },
-                      val: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please select an option';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),*/
                 ],
               ),
               inputTextFields(
@@ -1102,7 +1071,6 @@ class _QuotationScreenState extends State<QuotationScreen> {
                       return;
                     }
 
-                    // Add item to provider list
                     provider.addItem(
                       itemName: provider.itemNameController.text,
                       boxNumber: provider.itemBoxNumberController.text,
@@ -1111,8 +1079,6 @@ class _QuotationScreenState extends State<QuotationScreen> {
                       cft: provider.itemCFTController.text,
                       remark: provider.itemRemarkController.text,
                     );
-
-                    // Clear controllers
                     provider.itemNameController.clear();
                     provider.itemQuantityController.clear();
                     provider.itemValueController.clear();
@@ -1123,7 +1089,6 @@ class _QuotationScreenState extends State<QuotationScreen> {
                 ),
                 const SizedBox(height: 12),
 
-                // Show list of added items
                 ...provider.itemParticulars.asMap().entries.map((entry) {
                   final index = entry.key;
                   final item = entry.value;
@@ -1163,17 +1128,6 @@ class _QuotationScreenState extends State<QuotationScreen> {
     );
   }
 
-  /*Widget _buildItemDetailsTile() => _expansionTileWrapper(
-    title: 'ITEM / PARTICULAR DETAILS(सामान का विवरण)',
-    children: [
-      ItemEntryListWidget(
-        onItemListChanged: (items) {
-          particularItemsDetails = items;
-
-        },
-      ),
-    ],
-  );*/
 
   Widget _expansionTileWrapper({
     required String title,

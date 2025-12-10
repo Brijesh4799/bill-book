@@ -192,7 +192,10 @@ class PackingListPdfProvider with ChangeNotifier {
 */
 
 
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
+import 'package:path_provider/path_provider.dart';
 import '../../../../core/widgets/custom_additeam_list/ui/custom_AddItem_list.dart';
 import '../get_by_id_model/packing_get_byid_model.dart';
 import '../model/packing_list_pdf_model.dart' hide Data, ItemParticulars;
@@ -273,18 +276,67 @@ class PackingListPdfProvider with ChangeNotifier {
   }
 
   // --- Fetch all packing list data
-  Future<void> fetchpackingListData() async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
 
-    try {
-      _packingList = await _packingListPdfRepository.getpackinglistdataApi();
-    } catch (e) {
-      _errorMessage = 'Failed to load survey list: ${e.toString()}';
-    } finally {
-      _isLoading = false;
+
+  // Future<void> fetchpackingListData() async {
+  //   _isLoading = true;
+  //   _errorMessage = null;
+  //   notifyListeners();
+  //
+  //   try {
+  //     _packingList = await _packingListPdfRepository.getpackinglistdataApi();
+  //   } catch (e) {
+  //     _errorMessage = 'Failed to load survey list: ${e.toString()}';
+  //   } finally {
+  //     _isLoading = false;
+  //     notifyListeners();
+  //   }
+  // }
+
+  bool isLoading2 = false;
+  bool loading = false;
+  bool isLoadMoreRunning = false;
+  bool hasNextPage = true;
+  int page = 1;
+  void setLoading(bool loader) {
+    loading = loader;
+    notifyListeners();
+  }
+  Future<void> fetchpackingListData({bool isLoadMore = false}) async {
+    if (!isLoadMore) {
+      page = 1;
+      hasNextPage = true;
+      _packingList = null;
+      setLoading(true);
+    } else {
+      if (isLoadMoreRunning || !hasNextPage) return;
+      isLoadMoreRunning = true;
       notifyListeners();
+    }
+    try {
+      final response = await _packingListPdfRepository.getpackinglistdataApi(pageCount: page);
+      if (response.status == true &&
+          response.data != null &&
+          response.data!.isNotEmpty) {
+        if (isLoadMore) {
+          _packingList!.data!.addAll(response.data!);
+        } else {
+          _packingList = response;
+        }
+        page++;
+      } else {
+        hasNextPage = false;
+      }
+    } catch (e) {
+      print("Pagination Error: $e");
+      hasNextPage = false;
+    } finally {
+      if (!isLoadMore) {
+        setLoading(false);
+      } else {
+        isLoadMoreRunning = false;
+        notifyListeners();
+      }
     }
   }
 
@@ -392,4 +444,40 @@ class PackingListPdfProvider with ChangeNotifier {
     itemRemarkController.text = item.remark ?? "";
     notifyListeners();
   }
+
+  String? pdfLocalPath;
+  bool pdfLoading = false;
+  String? _errorMessage2;
+
+  String? get errorMessage2 => _errorMessage2;
+
+  Future<void> fetchpackagePdf(String id) async {
+    pdfLoading = true;
+    _errorMessage2 = null;
+    notifyListeners();
+
+    try {
+      final responseBytes = await  _packingListPdfRepository.packagepdfApi(id);
+
+      if (responseBytes != null) {
+        // Save PDF in temporary directory
+        final dir = await getTemporaryDirectory();
+        final file = File('${dir.path}/packing_$id.pdf');
+        await file.writeAsBytes(responseBytes);
+
+        pdfLocalPath = file.path;
+        print("✅ PDF saved at: $pdfLocalPath");
+      } else {
+        _errorMessage2 = "Empty PDF response";
+      }
+    } catch (e) {
+      _errorMessage2 = "Failed to fetch PDF: $e";
+      print(_errorMessage2);
+    } finally {
+      pdfLoading = false;
+      notifyListeners();
+    }
+  }
+
+
 }

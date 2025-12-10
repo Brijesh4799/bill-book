@@ -48,7 +48,7 @@ class NetworkApiServices extends BaseApiServices {
       log("Uploading to: $url");
       log("Token: $token");
       log("Fields: $fields");
-      log("Image Path: ${imageFile?.path}"); // Use null-aware operator
+      log("Image Path: ${imageFile?.path}");
     }
 
     var request = http.MultipartRequest('PATCH', Uri.parse(url));
@@ -56,7 +56,6 @@ class NetworkApiServices extends BaseApiServices {
       'Authorization': 'Bearer $token',
     });
 
-    // Add fields to the request
     fields.forEach((key, value) {
       if (key == 'service_id' && value is List<String>) {
         for (var i = 0; i < value.length; i++) {
@@ -74,7 +73,7 @@ class NetworkApiServices extends BaseApiServices {
       }
     });
 
-    // Add image file if it is not null
+
     if (imageFile != null) {
       request.files.add(
         await http.MultipartFile.fromPath(

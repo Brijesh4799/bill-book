@@ -1,5 +1,8 @@
 import 'dart:convert';
 
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../../../WebServices/app_url.dart';
 import '../../../../WebServices/network/network_api_services.dart';
 
@@ -8,9 +11,26 @@ import '../model/tws_pdf_model.dart';
 
 class TWSPdfRepository{
   final _apiService = NetworkApiServices();
-  Future<TwsPdfModel> gettwslistdataApi() async {
+  // Future<TwsPdfModel> gettwslistdataApi() async {
+  //   try {
+  //     final response = await _apiService.getApiWithToken(AppUrl.twsform);
+  //     print('response: $response');
+  //
+  //     if (response != null) {
+  //       // Parse the response into ProductsModel
+  //       return TwsPdfModel.fromJson(response);
+  //     } else {
+  //       throw Exception('Failed to load Cart data: response is null');
+  //     }
+  //   } catch (e) {
+  //     print('Error fetching Cart data: $e');
+  //     rethrow;
+  //   }
+  // }
+
+  Future<TwsPdfModel> gettwslistdataApi({required int pageCount}) async {
     try {
-      final response = await _apiService.getApiWithToken(AppUrl.twsform);
+      final response = await _apiService.getApiWithToken("${AppUrl.twsform}?page=$pageCount&limit=10");
       print('response: $response');
 
       if (response != null) {
@@ -24,6 +44,7 @@ class TWSPdfRepository{
       rethrow;
     }
   }
+
   Future<TwsPdfModel> deletetwsById(String id) async {
     try {
       //final response = await _apiService.deleteApiWithToken(AppUrl.surveylist/'$id');
@@ -54,7 +75,7 @@ class TWSPdfRepository{
       print('PATCH Response: $response');
 
       if (response != null) {
-        gettwslistdataApi();
+        gettwslistdataApi(pageCount:1);
         return TwsPdfModel.fromJson(response);
       } else {
         throw Exception('Failed to update tws data data: response is null');
@@ -81,6 +102,33 @@ class TWSPdfRepository{
     } catch (e) {
       print('Error fetching Cart data: $e');
       rethrow;
+    }
+  }
+
+  Future<dynamic> twspdfApi(String id) async {
+    try {
+      final url = "${AppUrl.twsPDF}/$id/pdf";
+      print("[log] PDF Url => $url");
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      var token = pref.getString("token");
+
+      print("[log] token => $token");
+
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/pdf",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return response.bodyBytes; // ✅ raw PDF bytes
+      } else {
+        throw Exception("Failed to load PDF. Status: ${response.statusCode}");
+      }
+    } catch (e) {
+      throw Exception("Error fetching PDF: $e");
     }
   }
 

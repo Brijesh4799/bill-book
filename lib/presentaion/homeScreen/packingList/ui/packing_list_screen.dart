@@ -10,14 +10,12 @@ import '../provider/packingProvider.dart';
 
 class PackingScreen extends StatefulWidget {
   final String mobileNumber;
-  //const PackingScreen({super.key});
   const PackingScreen({Key? key, required this.mobileNumber}) : super(key: key);
   @override
   _PackingScreenState createState() => _PackingScreenState();
 }
 
 class _PackingScreenState extends State<PackingScreen> {
-
   final TextEditingController nameController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
@@ -33,11 +31,6 @@ class _PackingScreenState extends State<PackingScreen> {
   TextEditingController itemBoxNumberController = TextEditingController();
   List<ListItem> particularItemsDetails = [];
 
-
-  void _SaveAllValues() {
-    print('--- Item / Particular Details ---');
-    print('Items: $particularItemsDetails}');
-  }
   @override
   void initState() {
     super.initState();
@@ -60,7 +53,6 @@ class _PackingScreenState extends State<PackingScreen> {
           ],
         ),
       ),
-
         bottomNavigationBar: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(12.0),
@@ -70,29 +62,24 @@ class _PackingScreenState extends State<PackingScreen> {
                   onPressed: () async {
                     HelperFunctions helper = HelperFunctions();
                     bool isConnected = await helper.isConnected();
-
                     if (!isConnected) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('No internet connection')),
                       );
                       return;
                     }
-
-                    // Call the provider's method
                     await provider.packinglist(
                       mobileNumber: widget.mobileNumber,
                       context: context,
                     );
-
-                    // Navigate to Home Page
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => HomeNavController()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 50), // Full width button
-                    backgroundColor: Colors.blue, // Customize as needed
+                    minimumSize: Size(double.infinity, 50),
+                    backgroundColor: Colors.blue,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -106,7 +93,6 @@ class _PackingScreenState extends State<PackingScreen> {
             ),
           ),
         )
-
     );
   }
 
@@ -172,16 +158,13 @@ class _PackingScreenState extends State<PackingScreen> {
               ),
               inputTextFields(
                 label: 'Vehicle No. (वाहन संख्या)',
-                //inputType: TextInputType.number,
                 textEditingController: provider.vehicalNoController,
               ),
             ],
           );
-
         }
     );
   }
-
 
   Widget _buildItemDetailsTile() {
     return _expansionTileWrapper(
@@ -261,7 +244,6 @@ class _PackingScreenState extends State<PackingScreen> {
                       return;
                     }
 
-                    // Add item to provider list
                     provider.addItem(
                       itemName: provider.itemNameController.text,
                       boxNumber: provider.itemBoxNumberController.text,
@@ -271,7 +253,6 @@ class _PackingScreenState extends State<PackingScreen> {
                       remark: provider.itemRemarkController.text,
                     );
 
-                    // Clear controllers
                     provider.itemNameController.clear();
                     provider.itemQuantityController.clear();
                     provider.itemValueController.clear();
@@ -282,7 +263,6 @@ class _PackingScreenState extends State<PackingScreen> {
                 ),
                 const SizedBox(height: 12),
 
-                // Show list of added items
                 ...provider.itemParticulars.asMap().entries.map((entry) {
                   final index = entry.key;
                   final item = entry.value;
@@ -321,21 +301,6 @@ class _PackingScreenState extends State<PackingScreen> {
       ],
     );
   }
-
-  /*Widget _buildItemDetailsTile() => _expansionTileWrapper(
-    title:'ITEM / PARTICULAR DETAILS (सामान का विवरण)',
-    children: [
-      ItemEntryListWidget(
-        onItemListChanged: (items) {
-          particularItemsDetails = items;
-        },
-        enableBoxNumber: true,
-        enableCFT: true,
-      )
-
-    ],
-  );*/
-
 
   Widget _expansionTileWrapper({required String title, required List<Widget> children}) {
     return Container(

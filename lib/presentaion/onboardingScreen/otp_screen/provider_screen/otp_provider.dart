@@ -1,3 +1,5 @@
+
+
 import 'dart:async';
 import 'package:BillBook/core/widgets/navigation_method.dart';
 import 'package:BillBook/presentaion/onboardingScreen/otp_screen/model/otp_verify_model.dart';
@@ -12,49 +14,51 @@ import '../repo/otp_repository.dart';
 class OtpProvider with ChangeNotifier {
   final TextEditingController otpController = TextEditingController();
   final FocusNode otpFocusNode = FocusNode();
-  VerifyOtpModel?verifyOtpModel;
+  VerifyOtpModel? verifyOtpModel;
 
   int _timeLeft = 30;
   Timer? _timer;
-  //int timerSeconds = 30;
   bool isResendEnabled = false;
-
 
   int get timeLeft => _timeLeft;
   String get timerText => "$_timeLeft seconds remaining";
 
-
-  Future<void> verifyOtp({required String mobileNumber,required BuildContext context}) async {
-
-
+  // ✅ Updated to accept fcmToken
+  Future<void> verifyOtp({
+    required String mobileNumber,
+    required BuildContext context,
+    required String fcmToken, // ✅ Added parameter here
+  }) async {
     final resendOtpRepository = VerifyOtpRepository();
     try {
+      // ✅ Send fcmToken along with the other parameters
       var response = await resendOtpRepository.verifyOtpApi({
         'mobileNo': mobileNumber,
-        'otp':otpController.text.trim()
+        'otp': otpController.text.trim(),
+        'deviceToken': fcmToken, // ✅ Added here in API payload
       });
-      if (response!.status == true) {
-        verifyOtpModel=response;
 
-        print("OTP resent successfully.");
+      if (response!.status == true) {
+        verifyOtpModel = response;
+
         SharedPreferences pref = await SharedPreferences.getInstance();
         pref.setString("token", verifyOtpModel!.token!);
-        print("Log in token is >>>>>>>>${pref.getString("token")}");
-        if(verifyOtpModel!.data!.user!.isNewUser==true){
-          navPushRemove(context: context, action: DetailForm(mobileNumber:mobileNumber,));
+        print("Token stored in SharedPreferences: ${verifyOtpModel!.token}");
+        print('>>>>>>>>>>>>>>>>>>>${fcmToken}');
 
-        }else{
+        if (verifyOtpModel!.data!.user!.isNewUser == true) {
+          navPushRemove(
+              context: context,
+              action: DetailForm(mobileNumber: mobileNumber));
+        } else {
           navPushRemove(context: context, action: HomeNavController());
         }
-
-
       } else {
-        print("Failed to resend OTP.");
+        print("Failed to verify OTP.");
       }
     } catch (e) {
-      print("Error resending OTP: $e");
+      print("Error verifying OTP: $e");
     }
-
     notifyListeners();
   }
 
@@ -78,6 +82,12 @@ class OtpProvider with ChangeNotifier {
     otpController.dispose();
   }
 
+  void clearFields() {
+    otpController.clear();
+    _timeLeft = 30;
+    isResendEnabled = false;
+    notifyListeners();
+  }
+
   String get otp => otpController.text;
 }
-

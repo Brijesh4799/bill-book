@@ -9,16 +9,8 @@ import '../../download_reports_details/packing_download_repots/ui/packing_repots
 import '../../download_reports_details/payment_voucher_report_download/ui/payment_voucher_report.dart';
 import '../../download_reports_details/quotation_report_download/ui/quotation_report_ui.dart';
 import '../../download_reports_details/survey_report_download/ui/survey_report_download.dart';
-import '../BillScreen/ui/bill_screen.dart';
-import '../LR-BilityScreen/ui/lr_blity_screen.dart';
-import '../carConditionScreen/ui/car_condition_screen.dart';
 import '../fov-scfFormScreen/ui/for_scf_form_screen.dart';
-import '../moneyReceiptScreen/ui/money_receipt_screen.dart';
 import '../nocLetterscreen/ui/noc_letter_screen.dart';
-import '../packingList/ui/packing_list_screen.dart';
-import '../paymentVoucherScreen/ui/payment_voucher_screen.dart';
-import '../quotationScreens/ui/quotaion_screen.dart';
-import '../surveyScreen/ui/survey_screen.dart';
 import '../twsFormScreen/ui/tws_form_screen.dart';
 import 'download_report.dart';
 
@@ -36,12 +28,6 @@ class ReportsDownloadListScreen extends StatelessWidget {
           vertical: screenHeight * 0.02,
         ),
         children: [
-          /*_buildListItem(
-            context,
-            title: "GST Reports",
-            subtitle: "Click here to go to download",
-            reportType: "GST Reports",
-          ),*/
           _buildListItem(
             context,
             title: "Quotation",
@@ -179,29 +165,6 @@ class ReportsDownloadListScreen extends StatelessWidget {
       ),
     );
   }
-
-
-  /*Widget _buildListItem(
-      BuildContext context, {
-        required String title,
-        required String subtitle,
-        required String reportType,
-      }) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: ListTile(
-        title: Text(
-          title,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        subtitle: Text(subtitle),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-        onTap: () {
-          downloadScreen(context, reportType: reportType);
-        },
-      ),
-    );
-  }*/
 
   void downloadScreen(BuildContext context, {required String reportType}) {
     Navigator.push(

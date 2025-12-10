@@ -1,29 +1,4 @@
 class QuotationTearmsAndConditionModel {
-  bool? status;
-  String? message;
-  CmsData? cmsData;
-
-  QuotationTearmsAndConditionModel({this.status, this.message, this.cmsData});
-
-  QuotationTearmsAndConditionModel.fromJson(Map<String, dynamic> json) {
-    status = json['status'];
-    message = json['message'];
-    cmsData =
-    json['cmsData'] != null ? new CmsData.fromJson(json['cmsData']) : null;
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['status'] = this.status;
-    data['message'] = this.message;
-    if (this.cmsData != null) {
-      data['cmsData'] = this.cmsData!.toJson();
-    }
-    return data;
-  }
-}
-
-class CmsData {
   String? sId;
   String? type;
   String? agreement;
@@ -33,7 +8,7 @@ class CmsData {
   String? aboutUs;
   int? iV;
 
-  CmsData(
+  QuotationTearmsAndConditionModel(
       {this.sId,
         this.type,
         this.agreement,
@@ -43,7 +18,7 @@ class CmsData {
         this.aboutUs,
         this.iV});
 
-  CmsData.fromJson(Map<String, dynamic> json) {
+  QuotationTearmsAndConditionModel.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];
     type = json['type'];
     agreement = json['agreement'];

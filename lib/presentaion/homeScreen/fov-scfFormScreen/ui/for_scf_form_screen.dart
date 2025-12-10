@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/utils/helperFuntions.dart';
 import '../../../../core/widgets/custom_app_bar/ui/customAppBar.dart';
-import '../../../../core/widgets/custom_Textbutton.dart';
 import '../../../../core/widgets/custom_dropDown.dart';
 import '../../../../core/widgets/custom_input_text_field.dart';
 import '../../home_controller.dart';
@@ -11,14 +10,12 @@ import '../provider/fov_scf_form_provider.dart';
 class FovScfFormScreen extends StatefulWidget {
   final String mobileNumber;
   const FovScfFormScreen({Key? key, required this.mobileNumber}) : super(key: key);
-  //const FovScfFormScreen({super.key});
 
   @override
   _FovScfFormScreen createState() => _FovScfFormScreen();
 }
 
 class _FovScfFormScreen extends State<FovScfFormScreen> {
-
   final TextEditingController fovMovingDateController = TextEditingController();
   final TextEditingController fovLrNumberController = TextEditingController();
   final TextEditingController fovNameController = TextEditingController();
@@ -26,18 +23,11 @@ class _FovScfFormScreen extends State<FovScfFormScreen> {
   final TextEditingController fovEmailController = TextEditingController();
   final TextEditingController fovMoveFromCityController = TextEditingController();
   final TextEditingController fovMoveToCityController = TextEditingController();
-
   String? fovMovingTypeValue;
   String? selectedInsuranceChargePercent;
   String? selectedInsuranceType;
 
-  void _saveAllValues() {
-
-  }
-
-
   @override
-
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: 'Fov-Scf Form'),
@@ -52,7 +42,6 @@ class _FovScfFormScreen extends State<FovScfFormScreen> {
           ],
         ),
       ),
-
         bottomNavigationBar: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(12.0),
@@ -62,29 +51,24 @@ class _FovScfFormScreen extends State<FovScfFormScreen> {
                   onPressed: () async {
                     HelperFunctions helper = HelperFunctions();
                     bool isConnected = await helper.isConnected();
-
                     if (!isConnected) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('No internet connection')),
                       );
                       return;
                     }
-
-                    // Call the provider's method
                     await provider.fovscfform(
                       mobileNumber: widget.mobileNumber,
                       context: context,
                     );
-
-                    // Navigate to Home Page
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => HomeNavController()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 50), // Full width button
-                    backgroundColor: Colors.blue, // Customize as needed
+                    minimumSize: Size(double.infinity, 50),
+                    backgroundColor: Colors.blue,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -177,7 +161,6 @@ class _FovScfFormScreen extends State<FovScfFormScreen> {
               ),
             ],
           );
-
         }
     );
   }

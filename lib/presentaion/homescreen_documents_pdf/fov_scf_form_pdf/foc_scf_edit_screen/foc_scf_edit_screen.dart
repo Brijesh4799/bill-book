@@ -1,27 +1,22 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../../../core/utils/helperFuntions.dart';
 import '../../../../core/widgets/custom_app_bar/ui/customAppBar.dart';
 import '../../../../core/widgets/custom_dropDown.dart';
 import '../../../../core/widgets/custom_input_text_field.dart';
-import '../../../homeScreen/fov-scfFormScreen/provider/fov_scf_form_provider.dart';
 import '../../../homeScreen/home_controller.dart';
 import '../provider/foc_scf_pdf_provider.dart';
 
 class FovScfFormEditScreen extends StatefulWidget {
   final String id;
   const FovScfFormEditScreen({Key? key, required this.id}) : super(key: key);
-  //const FovScfFormEditScreen({super.key});
 
   @override
   _FovScfFormEditScreen createState() => _FovScfFormEditScreen();
 }
 
 class _FovScfFormEditScreen extends State<FovScfFormEditScreen> {
-
   final TextEditingController fovMovingDateController = TextEditingController();
   final TextEditingController fovLrNumberController = TextEditingController();
   final TextEditingController fovNameController = TextEditingController();
@@ -29,14 +24,10 @@ class _FovScfFormEditScreen extends State<FovScfFormEditScreen> {
   final TextEditingController fovEmailController = TextEditingController();
   final TextEditingController fovMoveFromCityController = TextEditingController();
   final TextEditingController fovMoveToCityController = TextEditingController();
-
   String? fovMovingTypeValue;
   String? selectedInsuranceChargePercent;
   String? selectedInsuranceType;
 
-  void _saveAllValues() {
-
-  }
 
   void initState(){
     super.initState();
@@ -46,7 +37,6 @@ class _FovScfFormEditScreen extends State<FovScfFormEditScreen> {
     });
   }
   @override
-
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: CustomAppBar(title: 'Fov-Scf Form'),

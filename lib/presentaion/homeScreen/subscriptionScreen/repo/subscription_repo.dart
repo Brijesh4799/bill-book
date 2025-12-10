@@ -24,6 +24,16 @@ class SubscriptionRepository {
     }
   }
 
+  Future<SubscriptionPostModel?> CreateRozpay(var data) async {
+    try {
+      dynamic response =
+      await _apiService. postApiWithToken(data, AppUrl.razorpay);
+      return SubscriptionPostModel.fromJson(response);
+    } catch (e) {
+      throw e;
+    }
+  }
+
   Future<SubscriptionPostModel?> postsubscription(var data) async {
     try {
       dynamic response =

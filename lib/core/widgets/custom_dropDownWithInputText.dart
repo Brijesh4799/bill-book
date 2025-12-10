@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 
 class CustomDropdown extends StatefulWidget {
-  final TextEditingController? controller; // ✅ optional now
+  final TextEditingController? controller;
   final String label;
   final List<String> items;
   final String? selectedItem;
@@ -13,7 +13,7 @@ class CustomDropdown extends StatefulWidget {
 
   const CustomDropdown({
     Key? key,
-    this.controller, // ✅ not required anymore
+    this.controller,
     required this.label,
     required this.items,
     this.selectedItem,
@@ -168,7 +168,7 @@ class DropdownWithInputField2 extends StatelessWidget {
     this.labelText2,
     this.dropDownhint2,
     this.readOnly2 = false,
-    this.borderColor2,
+    this.borderColor2, required TextEditingController controller, required TextEditingController controller2,
   }) : super(key: key);
 
   @override

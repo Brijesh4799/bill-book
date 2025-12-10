@@ -81,6 +81,9 @@ class _QuotationEditScreenState extends State<QuotationEditScreen> {
   final TextEditingController moveToCityController = TextEditingController();
   final TextEditingController moveToPincodeController = TextEditingController();
   final TextEditingController moveToAddressController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController surchargeController = TextEditingController();
+  final TextEditingController surchargeController2 = TextEditingController();
 
 
   String? selectedToFloor;
@@ -255,7 +258,7 @@ class _QuotationEditScreenState extends State<QuotationEditScreen> {
               textEditingController: provider.quotationNumberController,
             ),
 
-            customDropdown(
+            /*customDropdown(
               label: 'Moving Type (मूविंग के प्रकार)',
               items: QuotaionDetaildropdownItems,
               selectedItem: provider.selectedMovingType,
@@ -263,6 +266,19 @@ class _QuotationEditScreenState extends State<QuotationEditScreen> {
                 provider.setMovingType(value);
               },
               val: (value) => provider.validateMovingType(value), controller: null,
+            ),*/
+            customDropdown(
+              label: 'Moving Type (मूविंग के प्रकार)',
+              items: QuotaionDetaildropdownItems,
+              selectedItem: provider.selectedMovingType,
+              controller: provider.movingtypecontrooler, // ✅ used if customDropdown expects this
+              onChanged: (value) {
+                provider.setMovingType(value);
+
+                // ✅ correctly update the controller
+                provider.movingtypecontrooler.text = value ?? '';
+              },
+              val: (value) => provider.validateMovingType(value),
             ),
 
             inputTextFields(
@@ -282,6 +298,12 @@ class _QuotationEditScreenState extends State<QuotationEditScreen> {
               label: 'Email (ईमेल)',
               inputType: TextInputType.emailAddress,
               textEditingController: provider.emailController,
+            ),
+            inputTextFields(
+              label: 'PHONE* (फोन)',
+              inputType: TextInputType.phone,
+              maxLength: 10,
+              textEditingController: provider.phoneController,
             ),
             Row(
               children: [
@@ -396,7 +418,7 @@ class _QuotationEditScreenState extends State<QuotationEditScreen> {
                 maxLines: 3,
                 textEditingController: provider.moveFromAddressController,
               ),
-              Row(
+            /*  Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Expanded(
@@ -430,6 +452,84 @@ class _QuotationEditScreenState extends State<QuotationEditScreen> {
                       },
                     ),
                   ),
+                ],
+              ),*/
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  /* Expanded(
+                    child: Consumer<QuatationProvider>(
+                      builder: (context, provider, child) {
+                        return customDropdown(
+                          label: 'FLOOR (मंजिल)',
+                          items: floorOptions,
+                          selectedItem: provider.selectedFromFloor,
+                          onChanged: (value) {
+                            provider.setFromFloor(value);
+                          },
+                          val: provider.validateDropdown,
+                          controller: moveformfloorcontoller,
+                        );
+                      },
+                    ),
+                  ),*/
+                  Expanded(
+                    child: Consumer<QuatationProvider>(
+                      builder: (context, provider, child) {
+                        return customDropdown(
+                          label: 'FLOOR (मंजिल)',
+                          items: floorOptions,
+                          selectedItem: provider.selectedFromFloor,
+                          onChanged: (value) {
+                            provider.setFromFloor(value);
+
+                            // ✅ Also update the controller so it gets sent in the form data
+                            provider.moveformfloorcontoller.text = value ?? '';
+                          },
+                          val: provider.validateDropdown,
+                          controller: provider.moveformfloorcontoller, // ✅ correct controller from provider
+                        );
+                      },
+                    ),
+                  ),
+
+                  SizedBox(width: 10),
+                  /*Expanded(
+                    child: Consumer<QuatationProvider>(
+                      builder: (context, provider, child) {
+                        return customDropdown(
+                          label: 'IS LIFT AVAILABLE (क्या लिफ्ट उपलब्ध है)',
+                          items: liftOptions,
+                          selectedItem: provider.selectedFromLiftAvailable,
+                          onChanged: (value) {
+                            provider.setFromLiftAvailable(value);
+                          },
+                          val: provider.validateDropdown,
+                          controller: moveformliftcontoller,
+                        );
+                      },
+                    ),
+                  ),*/
+                  Expanded(
+                    child: Consumer<QuatationProvider>(
+                      builder: (context, provider, child) {
+                        return customDropdown(
+                          label: 'IS LIFT AVAILABLE (क्या लिफ्ट उपलब्ध है)',
+                          items: liftOptions,
+                          selectedItem: provider.selectedFromLiftAvailable,
+                          onChanged: (value) {
+                            provider.setFromLiftAvailable(value);
+
+                            // ✅ update the controller so it will be sent in the form data
+                            provider.moveformliftcontoller.text = value ?? '';
+                          },
+                          val: provider.validateDropdown,
+                          controller: provider.moveformliftcontoller, // ✅ use the correct controller
+                        );
+                      },
+                    ),
+                  ),
+
                 ],
               ),
             ],
@@ -487,8 +587,10 @@ class _QuotationEditScreenState extends State<QuotationEditScreen> {
                           selectedItem: provider.selectedToFloor,
                           onChanged: (value) {
                             provider.setToFloor(value);
+                            provider.movetocontroller.text = value ?? ''; // ✅ update controller
                           },
-                          val: provider.validateDropdown, controller: null,
+                          val: provider.validateDropdown,
+                          controller: provider.movetocontroller, // ✅ use provider's controller
                         );
                       },
                     ),
@@ -503,8 +605,10 @@ class _QuotationEditScreenState extends State<QuotationEditScreen> {
                           selectedItem: provider.selectedToLiftAvailable,
                           onChanged: (value) {
                             provider.setToLiftAvailable(value);
+                            provider.movetoliftcontoller.text = value ?? ''; // ✅ update controller
                           },
-                          val: provider.validateDropdown, controller: null,
+                          val: provider.validateDropdown,
+                          controller: provider.movetoliftcontoller, // ✅ use provider's controller
                         );
                       },
                     ),
@@ -535,7 +639,7 @@ class _QuotationEditScreenState extends State<QuotationEditScreen> {
                 inputType: TextInputType.number,
                 textEditingController: provider.advancePaidController,
               ),
-              DropdownWithInputField(
+             /* DropdownWithInputField(
                 dropdownValue: provider.selectedPackingChargeOption,
                 onDropdownChanged: (val) {
                   provider.setPackingChargeOption(val);
@@ -544,9 +648,27 @@ class _QuotationEditScreenState extends State<QuotationEditScreen> {
                 controller: provider.packingChargeController,
                 hintText: '0',
                 labelText: 'PACKING CHARGE',
+              ),*/
+              DropdownWithInputField(
+                dropdownValue: provider.selectedPackingChargeOption,
+                onDropdownChanged: (val) {
+                  provider.setPackingChargeOption(val);
+
+                  if (val == "Extra") {
+                    // Let user type manually
+                    provider.packingChargeController.clear();
+                  } else {
+                    // Just use the dropdown selected value
+                    provider.packingChargeController.text = val ?? '';
+                  }
+                },
+                dropdownItems: chargeOptions, // e.g. ["1000", "2000", "Extra"]
+                controller: provider.packingChargeController,
+                hintText: '0',
+                labelText: 'PACKING CHARGE',
               ),
 
-              DropdownWithInputField(
+              /*DropdownWithInputField(
                 dropdownValue: provider.unpackingChargeOption,
                 onDropdownChanged: (val) {
                   provider.setUnpackingChargeOption(val!);
@@ -555,9 +677,27 @@ class _QuotationEditScreenState extends State<QuotationEditScreen> {
                 controller: provider.unpackingChargeController,
                 hintText: '0',
                 labelText: 'UNPACKING CHARGE',
+              ),*/
+              DropdownWithInputField(
+                dropdownValue: provider.unpackingChargeOption,
+                onDropdownChanged: (val) {
+                  provider.setUnpackingChargeOption(val!);
+
+                  if (val == "Extra") {
+                    // Let user type freely
+                    provider.unpackingChargeController.clear();
+                  } else {
+                    // Just set dropdown value, ignore text field
+                    provider.unpackingChargeController.text = val;
+                  }
+                },
+                dropdownItems: chargeOptions, // e.g. ["1000", "2000", "Extra"]
+                controller: provider.unpackingChargeController,
+                hintText: '0',
+                labelText: 'UNPACKING CHARGE',
               ),
 
-              DropdownWithInputField(
+             /* DropdownWithInputField(
                 dropdownValue: provider.loadingChargeOption,
                 onDropdownChanged: (val) {
                   provider.setLoadingChargeOption(val!);
@@ -566,9 +706,27 @@ class _QuotationEditScreenState extends State<QuotationEditScreen> {
                 controller: provider.loadingChargeController,
                 hintText: '0',
                 labelText: 'LOADING CHARGE',
+              ),*/
+              DropdownWithInputField(
+                dropdownValue: provider.loadingChargeOption,
+                onDropdownChanged: (val) {
+                  provider.setLoadingChargeOption(val!);
+
+                  if (val == "Extra") {
+                    // Clear so user can type manually
+                    provider.loadingChargeController.clear();
+                  } else {
+                    // Set dropdown value directly
+                    provider.loadingChargeController.text = val ?? '';
+                  }
+                },
+                dropdownItems: chargeOptions, // Example: ["1000", "2000", "Extra"]
+                controller: provider.loadingChargeController,
+                hintText: '0',
+                labelText: 'LOADING CHARGE',
               ),
 
-              DropdownWithInputField(
+             /* DropdownWithInputField(
                 dropdownValue: provider.unloadingChargeOption,
                 onDropdownChanged: (val) {
                   provider.setUnloadingChargeOption(val!);
@@ -577,14 +735,50 @@ class _QuotationEditScreenState extends State<QuotationEditScreen> {
                 controller: provider.unloadingChargeController,
                 hintText: '0',
                 labelText: 'UNLOADING CHARGE',
+              ),*/
+              DropdownWithInputField(
+                dropdownValue: provider.unloadingChargeOption,
+                onDropdownChanged: (val) {
+                  provider.setUnloadingChargeOption(val!);
+
+                  if (val == "Extra") {
+                    // Clear for manual entry
+                    provider.unloadingChargeController.clear();
+                  } else {
+                    // Use the selected dropdown value
+                    provider.unloadingChargeController.text = val ?? '';
+                  }
+                },
+                dropdownItems: chargeOptions, // Example: ["1000", "2000", "Extra"]
+                controller: provider.unloadingChargeController,
+                hintText: '0',
+                labelText: 'UNLOADING CHARGE',
               ),
 
-              DropdownWithInputField(
+            /*  DropdownWithInputField(
                 dropdownValue: provider.packingMaterialChargeOption,
                 onDropdownChanged: (val) {
                   provider.setPackingMaterialChargeOption(val!);
                 },
                 dropdownItems: chargeOptions,
+                controller: provider.packingMaterialChargeController,
+                hintText: '0',
+                labelText: 'PACKING MATERIAL CHARGE',
+              ),*/
+              DropdownWithInputField(
+                dropdownValue: provider.packingMaterialChargeOption,
+                onDropdownChanged: (val) {
+                  provider.setPackingMaterialChargeOption(val!);
+
+                  if (val == "Extra") {
+                    // Clear so user can type a custom value
+                    provider.packingMaterialChargeController.clear();
+                  } else {
+                    // Use the selected dropdown option directly
+                    provider.packingMaterialChargeController.text = val ?? '';
+                  }
+                },
+                dropdownItems: chargeOptions, // Example: ["500", "1000", "Extra"]
                 controller: provider.packingMaterialChargeController,
                 hintText: '0',
                 labelText: 'PACKING MATERIAL CHARGE',
@@ -654,7 +848,7 @@ class _QuotationEditScreenState extends State<QuotationEditScreen> {
                 ],
               ),
 
-              DropdownWithInputField2(
+              /*DropdownWithInputField2(
                 dropdownValue: surchargeOption,
                 dropdownValue2: surchargeOption2,
 
@@ -670,8 +864,31 @@ class _QuotationEditScreenState extends State<QuotationEditScreen> {
                 dropdownItems: chargeOptions,
                 dropdownItems2: chargeOptions2,
                 labelText: 'SURCHARGE',
-              ),
+                controller: surchargeController,
+                controller2: surchargeController2,
+              ),*/
 
+              DropdownWithInputField2(
+                dropdownValue: surchargeOption,
+                dropdownValue2: surchargeOption2,
+                onDropdownChanged: (val) {
+                  setState(() {
+                    surchargeOption = val;
+                    provider.surchargeController.text = val ?? '';
+                  });
+                },
+                onDropdownChanged2: (val) {
+                  setState(() {
+                    surchargeOption2 = val;
+                    provider.surchargeController2.text = val ?? '';
+                  });
+                },
+                dropdownItems: chargeOptions,
+                dropdownItems2: chargeOptions2,
+                controller: provider.surchargeController,
+                controller2: provider.surchargeController2,
+                labelText: 'SURCHARGE',
+              ),
               customDropdown(
                 label: 'GST SHOW/HIDE GST',
                 items: gstOptions,
@@ -689,7 +906,7 @@ class _QuotationEditScreenState extends State<QuotationEditScreen> {
                 }, controller: null,
               ),
 
-              Row(
+           /*   Row(
                 children: [
                   Expanded(
                     flex: 1,
@@ -730,6 +947,61 @@ class _QuotationEditScreenState extends State<QuotationEditScreen> {
                       }, controller: null,
                     ),
                   ),
+                ],
+              ),*/
+              Row(
+                children: [
+
+                  Expanded(
+                    flex: 1,
+                    child: Consumer<QuatationProvider>(
+                      builder: (context, provider, child) {
+                        return customDropdown(
+                          label: 'GST%',
+                          items: ['0%', '5%', '12%', '18%', '28%'],
+                          selectedItem: provider.selectedGstPercent,
+                          onChanged: (value) {
+                            provider.setGstPercent(value);
+                            provider.gtspershowingcontolller.text = value ?? ''; // ✅ update controller
+                          },
+                          val: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please select an option';
+                            }
+                            return null;
+                          },
+                          controller: provider.gtspershowingcontolller,
+                        );
+                      },
+                    ),
+                  ),
+
+                  SizedBox(width: 10),
+
+                  Expanded(
+                    flex: 2,
+                    child: Consumer<QuatationProvider>(
+                      builder: (context, provider, child) {
+                        return customDropdown(
+                          label: 'GST TYPE',
+                          items: ['CGST/SGST', 'CGST/UTGST', 'IGST'],
+                          selectedItem: provider.selectedGstType, // use provider value
+                          onChanged: (value) {
+                            provider.setGstType(value); // update provider
+                            provider.gsttypecontroller.text = value ?? ''; // also update controller
+                          },
+                          val: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please select an option';
+                            }
+                            return null;
+                          },
+                          controller: provider.gsttypecontroller,
+                        );
+                      },
+                    ),
+                  ),
+
                 ],
               ),
 

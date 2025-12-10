@@ -156,6 +156,7 @@ class QuotationDetails {
   var partyname;
   var email;
   var qtdate;
+  var phone;
   var shiptdate;
 
   QuotationDetails(
@@ -168,6 +169,7 @@ class QuotationDetails {
         this.partyname,
         this.email,
         this.qtdate,
+        this.phone,
         this.shiptdate});
 
   QuotationDetails.fromJson(Map<String, dynamic> json) {
@@ -180,6 +182,7 @@ class QuotationDetails {
     partyname = json['partyname'];
     email = json['email'];
     qtdate = json['qtdate'];
+    phone = json['phone'];
     shiptdate = json['shiptdate'];
   }
 
@@ -194,6 +197,7 @@ class QuotationDetails {
     data['partyname'] = this.partyname;
     data['email'] = this.email;
     data['qtdate'] = this.qtdate;
+    data['phone'] = this.phone;
     data['shiptdate'] = this.shiptdate;
     return data;
   }
@@ -296,6 +300,7 @@ class PaymentDetails {
   var stcharge;
   var octriogreentax;
   var surcharge;
+  var surchargevalue;
   var gstshowhide;
   var gstPercent;
   var gsttype;
@@ -317,6 +322,7 @@ class PaymentDetails {
         this.stcharge,
         this.octriogreentax,
         this.surcharge,
+        this.surchargevalue,
         this.gstshowhide,
         this.gstPercent,
         this.gsttype,
@@ -338,6 +344,7 @@ class PaymentDetails {
     stcharge = json['stcharge'];
     octriogreentax = json['octriogreentax'];
     surcharge = json['surcharge'];
+    surchargevalue = json['surchargevalue'];
     gstshowhide = json['gstshowhide'];
     gstPercent = json['gstPercent'];
     gsttype = json['gsttype'];

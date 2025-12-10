@@ -1,15 +1,8 @@
-
-
 import 'package:BillBook/core/widgets/custom_Textbutton.dart';
 import 'package:BillBook/core/widgets/custom_image_view.dart';
-import 'package:BillBook/presentaion/homeScreen/packingList/ui/packing_list_screen.dart';
-import 'package:BillBook/presentaion/homeScreen/paymentVoucherScreen/ui/payment_voucher_screen.dart';
-import 'package:BillBook/presentaion/homeScreen/quotationScreens/ui/quotaion_screen.dart';
 import 'package:BillBook/presentaion/homeScreen/reportDownloadsScreen/download_report_List.dart';
 import 'package:BillBook/presentaion/homeScreen/staffScreen/staff_list_screen.dart';
 import 'package:BillBook/presentaion/homeScreen/staffScreen/staff_report_screen.dart';
-import 'package:BillBook/presentaion/homeScreen/surveyScreen/ui/survey_screen.dart';
-import 'package:BillBook/presentaion/homeScreen/twsFormScreen/ui/tws_form_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/widgets/banner.dart';
@@ -17,18 +10,14 @@ import '../../core/widgets/custom_app_bar/ui/customAppBar.dart';
 import '../../core/widgets/custom_gridbuilder.dart';
 import '../../core/widgets/custom_gridebuilder_datapost.dart';
 import '../../core/widgets/home_page_custom/provider/home_page_provider.dart';
-import 'BillScreen/ui/bill_screen.dart';
-import 'LR-BilityScreen/ui/lr_blity_screen.dart';
-import 'ProformaInvoice/ui/proforma_invoice_screen.dart';
-import 'carConditionScreen/ui/car_condition_screen.dart';
-import 'fov-scfFormScreen/ui/for_scf_form_screen.dart';
-import 'moneyReceiptScreen/ui/money_receipt_screen.dart';
-import 'nocLetterscreen/ui/noc_letter_screen.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
   @override
   State<HomePage> createState() => _HomePageState();
 }
+
 class _HomePageState extends State<HomePage> {
   @override
   void initState() {
@@ -37,7 +26,6 @@ class _HomePageState extends State<HomePage> {
       Provider.of<HomePageProvider>(context, listen: false).homeListData();
     });
   }
-
 
   final List<DocumentItem1> serviceItems = [
     DocumentItem1(title: "Quotation", imagePath: 'assets/images/QuotationIcon.png'),
@@ -53,11 +41,14 @@ class _HomePageState extends State<HomePage> {
     DocumentItem1(title: "Fov-Scf Form", imagePath: 'assets/images/fovFormIcon.png'),
     DocumentItem1(title: "NOC Letter", imagePath: 'assets/images/NOCIcon.png'),
   ];
+
   @override
   Widget build(BuildContext context) {
     final homeProvider = Provider.of<HomePageProvider>(context);
     final docCounts = homeProvider.homeList?.docCounts;
-    final banner = homeProvider.homeList?.banners;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final textScale = MediaQuery.of(context).textScaleFactor;
 
     final List<DocumentItem> documentItems = [
       DocumentItem(title: "Quotation", icon: Icons.list_alt, count: docCounts?.quotation ?? 0),
@@ -74,23 +65,18 @@ class _HomePageState extends State<HomePage> {
       DocumentItem(title: "NOC Letter", icon: Icons.mark_email_read, count: docCounts?.noc ?? 0),
     ];
 
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-    final textScale = MediaQuery.of(context).textScaleFactor;
-
-    String getFullImageUrl(String? path) {
-      if (path == null || path.isEmpty) return "";
-      return "http://167.71.232.245:8970/${path.replaceAll("\\", "/")}";
+    // Show loader when loading
+    if (homeProvider.isLoading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
     }
-
-
-
     return Scaffold(
-      appBar: CustomAppBar(home: true),
+      appBar: const CustomAppBar(home: true),
       backgroundColor: Colors.white,
-      body: homeProvider.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
+      body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -101,11 +87,9 @@ class _HomePageState extends State<HomePage> {
                 'assets/images/Banner.png',
               ],
             ),
-
             DocumentGridSection1(
               items: serviceItems,
               border: true,
-
               onPressed: (item) {
                 print("Tapped on ${item.title}");
               },
@@ -131,7 +115,6 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   SizedBox(height: screenHeight * 0.02),
-
                   Row(
                     children: [
                       Expanded(
@@ -174,9 +157,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-
-
-
-
-

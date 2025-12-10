@@ -16,6 +16,15 @@ class StaffListRepository{
       throw e;
     }
   }
+  Future<StafeListModel?> activestaffapi(var data) async {
+    try {
+      dynamic response =
+      await _apiService. getApiWithToken( AppUrl.activestafflist);
+      return StafeListModel.fromJson(response);
+    } catch (e) {
+      throw e;
+    }
+  }
 
   Future<StaffListPostModel?> Poststaff(var data) async {
     try {
@@ -28,3 +37,5 @@ class StaffListRepository{
   }
 
 }
+
+//activestafflist

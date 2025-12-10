@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../get_by_id_model/lr_bilty_getbyid_model.dart';
 import '../model/lr_bilty_pdf_model.dart';
@@ -98,22 +101,72 @@ class LrBiltyPdfProvider with ChangeNotifier{
   String? get errorMessage => _errorMessage;
 
 
-  Future<void> fetchlrbiltyListData() async {
-    _isLoading = true;
-    _errorMessage = null;
+  // Future<void> fetchlrbiltyListData() async {
+  //   _isLoading = true;
+  //   _errorMessage = null;
+  //   notifyListeners();
+  //
+  //   try {
+  //     _lrbitlty = await _lrBiltyPdfRepository. getlrbiltydatadataApi();
+  //
+  //
+  //   } catch (e) {
+  //     _errorMessage = 'Failed to load lrbilty list: ${e.toString()}';
+  //   } finally {
+  //     _isLoading = false;
+  //     notifyListeners();
+  //   }
+  // }
+
+
+  bool isLoading2 = false;
+  bool loading = false;
+  bool isLoadMoreRunning = false;
+  bool hasNextPage = true;
+  int page = 1;
+  void setLoading(bool loader) {
+    loading = loader;
     notifyListeners();
-
-    try {
-      _lrbitlty = await _lrBiltyPdfRepository. getlrbiltydatadataApi();
-
-
-    } catch (e) {
-      _errorMessage = 'Failed to load lrbilty list: ${e.toString()}';
-    } finally {
-      _isLoading = false;
+  }
+  Future<void> fetchlrbiltyListData({bool isLoadMore = false}) async {
+    if (!isLoadMore) {
+      page = 1;
+      hasNextPage = true;
+      _lrbitlty = null;
+      setLoading(true);
+    } else {
+      if (isLoadMoreRunning || !hasNextPage) return;
+      isLoadMoreRunning = true;
       notifyListeners();
     }
+    try {
+      final response = await _lrBiltyPdfRepository.getlrbiltydatadataApi(pageCount: page);
+      if (response.status == true &&
+          response.data != null &&
+          response.data!.isNotEmpty) {
+        if (isLoadMore) {
+          _lrbitlty!.data!.addAll(response.data!);
+        } else {
+          _lrbitlty = response;
+        }
+        page++;
+      } else {
+        hasNextPage = false;
+      }
+    } catch (e) {
+      print("Pagination Error: $e");
+      hasNextPage = false;
+    } finally {
+      if (!isLoadMore) {
+        setLoading(false);
+      } else {
+        isLoadMoreRunning = false;
+        notifyListeners();
+      }
+    }
   }
+
+
   final _repo = LrBiltyRepository();
   Future<bool> deletepacking(String id) async {
     try {
@@ -335,6 +388,41 @@ class LrBiltyPdfProvider with ChangeNotifier{
     } catch (e) {
       _errorMessage = 'Failed to load LR Bilty data: ${e.toString()}';
       print(_errorMessage);
+    }
+  }
+
+
+  String? pdfLocalPath;
+  bool pdfLoading = false;
+  String? _errorMessage2;
+
+  String? get errorMessage2 => _errorMessage2;
+
+  Future<void> fetchlrbiltyPdf(String id) async {
+    pdfLoading = true;
+    _errorMessage2 = null;
+    notifyListeners();
+
+    try {
+      final responseBytes = await  _lrBiltyPdfRepository.lrbiltypdfApi(id);
+
+      if (responseBytes != null) {
+        // Save PDF in temporary directory
+        final dir = await getTemporaryDirectory();
+        final file = File('${dir.path}/lr_bilty_$id.pdf');
+        await file.writeAsBytes(responseBytes);
+
+        pdfLocalPath = file.path;
+        print("✅ PDF saved at: $pdfLocalPath");
+      } else {
+        _errorMessage2 = "Empty PDF response";
+      }
+    } catch (e) {
+      _errorMessage2 = "Failed to fetch PDF: $e";
+      print(_errorMessage2);
+    } finally {
+      pdfLoading = false;
+      notifyListeners();
     }
   }
 

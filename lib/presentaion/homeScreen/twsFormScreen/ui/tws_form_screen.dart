@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/utils/helperFuntions.dart';
 import '../../../../core/widgets/custom_app_bar/ui/customAppBar.dart';
-import '../../../../core/widgets/custom_Textbutton.dart';
 import '../../../../core/widgets/custom_dropDown.dart';
 import '../../../../core/widgets/custom_input_text_field.dart';
 import '../../home_controller.dart';
@@ -10,9 +9,7 @@ import '../provider/tws_form_provider.dart';
 
 class TwsFormScreen extends StatefulWidget {
   final String mobileNumber;
-  //const TwsFormScreen({super.key});
   const TwsFormScreen({Key? key, required this.mobileNumber}) : super(key: key);
-
   @override
   _TwsFormScreen createState() => _TwsFormScreen();
 }
@@ -30,15 +27,7 @@ class _TwsFormScreen extends State<TwsFormScreen> {
 
   String? movingTypeValue;
 
-
-
-  void _saveAllValues() {
-
-  }
-
-
   @override
-
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: 'Tws Form'),
@@ -52,7 +41,6 @@ class _TwsFormScreen extends State<TwsFormScreen> {
           ],
         ),
       ),
-
         bottomNavigationBar: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(12.0),
@@ -62,29 +50,24 @@ class _TwsFormScreen extends State<TwsFormScreen> {
                   onPressed: () async {
                     HelperFunctions helper = HelperFunctions();
                     bool isConnected = await helper.isConnected();
-
                     if (!isConnected) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('No internet connection')),
                       );
                       return;
                     }
-
-                    // Call the provider's method
                     await provider.twsform(
                       mobileNumber: widget.mobileNumber,
                       context: context,
                     );
-
-                    // Navigate to Home Page
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => HomeNavController()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 50), // Full width button
-                    backgroundColor: Colors.blue, // Customize as needed
+                    minimumSize: Size(double.infinity, 50),
+                    backgroundColor: Colors.blue,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -98,7 +81,6 @@ class _TwsFormScreen extends State<TwsFormScreen> {
             ),
           ),
         )
-
     );
   }
 

@@ -341,6 +341,7 @@ class ConsigneeDetails {
 class PackageDetails {
   String? packageType;
   String? packagetotalWeight;
+  String? packagetotalWeightype;
   String? packagedescription;
   String? packageHSN;
   String? packageRemark;
@@ -348,6 +349,7 @@ class PackageDetails {
   PackageDetails(
       {this.packageType,
         this.packagetotalWeight,
+        this.packagetotalWeightype,
         this.packagedescription,
         this.packageHSN,
         this.packageRemark});
@@ -355,6 +357,7 @@ class PackageDetails {
   PackageDetails.fromJson(Map<String, dynamic> json) {
     packageType = json['packageType'];
     packagetotalWeight = json['packagetotalWeight'];
+    packagetotalWeightype = json['packagetotalWeightype'];
     packagedescription = json['packagedescription'];
     packageHSN = json['packageHSN'];
     packageRemark = json['packageRemark'];
@@ -364,6 +367,7 @@ class PackageDetails {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['packageType'] = this.packageType;
     data['packagetotalWeight'] = this.packagetotalWeight;
+    data['packagetotalWeightype'] = this.packagetotalWeightype;
     data['packagedescription'] = this.packagedescription;
     data['packageHSN'] = this.packageHSN;
     data['packageRemark'] = this.packageRemark;
@@ -479,16 +483,19 @@ class PaymentDetails {
 class InsuranceDetails {
   String? insuranceType;
   String? insuranceCharges;
+  String? insuranceCharges1;
   String? declarationValueOfGoods;
 
   InsuranceDetails(
       {this.insuranceType,
         this.insuranceCharges,
+        this.insuranceCharges1,
         this.declarationValueOfGoods});
 
   InsuranceDetails.fromJson(Map<String, dynamic> json) {
     insuranceType = json['insuranceType'];
     insuranceCharges = json['insuranceCharges'];
+    insuranceCharges1 = json['insuranceCharges1'];
     declarationValueOfGoods = json['declarationValueOfGoods'];
   }
 
@@ -496,6 +503,7 @@ class InsuranceDetails {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['insuranceType'] = this.insuranceType;
     data['insuranceCharges'] = this.insuranceCharges;
+    data['insuranceCharges1'] = this.insuranceCharges1;
     data['declarationValueOfGoods'] = this.declarationValueOfGoods;
     return data;
   }
@@ -504,14 +512,16 @@ class InsuranceDetails {
 class VehicleInsuranceDetails {
   String? vehicleNumber;
   String? insuranceType;
+  String? insuranceType1;
   String? insuranceCharges;
 
   VehicleInsuranceDetails(
-      {this.vehicleNumber, this.insuranceType, this.insuranceCharges});
+      {this.vehicleNumber, this.insuranceType, this.insuranceCharges,this.insuranceType1});
 
   VehicleInsuranceDetails.fromJson(Map<String, dynamic> json) {
     vehicleNumber = json['vehicleNumber'];
     insuranceType = json['insuranceType'];
+    insuranceType1 = json['insuranceType1'];
     insuranceCharges = json['insuranceCharges'];
   }
 
@@ -519,6 +529,7 @@ class VehicleInsuranceDetails {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['vehicleNumber'] = this.vehicleNumber;
     data['insuranceType'] = this.insuranceType;
+    data['insuranceType1'] = this.insuranceType1;
     data['insuranceCharges'] = this.insuranceCharges;
     return data;
   }

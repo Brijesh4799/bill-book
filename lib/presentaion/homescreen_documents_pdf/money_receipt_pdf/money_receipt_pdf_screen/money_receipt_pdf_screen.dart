@@ -1,65 +1,175 @@
+/*
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
-import 'package:http/http.dart' as http;
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
-
+import 'package:provider/provider.dart';
 import '../../../../core/widgets/custom_app_bar/ui/customAppBar.dart';
+import '../provider/money_receipt_pdf_provider.dart';
 
-class MoneyReceiptPdfWebViewScreen extends StatefulWidget {
+
+
+
+class MoneyPdfWebViewScreen extends StatefulWidget {
   final String id;
-
-  const MoneyReceiptPdfWebViewScreen({Key? key, required this.id}) : super(key: key);
+  const MoneyPdfWebViewScreen({Key? key, required this.id}) : super(key: key);
 
   @override
-  _MoneyReceiptPdfWebViewScreenState createState() => _MoneyReceiptPdfWebViewScreenState();
+  _MoneyPdfWebViewScreenState createState() => _MoneyPdfWebViewScreenState();
 }
 
-class _MoneyReceiptPdfWebViewScreenState extends State<MoneyReceiptPdfWebViewScreen> {
-  String? localPath;
-
+class _MoneyPdfWebViewScreenState extends State<MoneyPdfWebViewScreen> {
   @override
   void initState() {
     super.initState();
-    print(" Received money ID: ${widget.id}"); // Debug log
-    _downloadPdf();
-  }
-
-  Future<void> _downloadPdf() async {
-    if (widget.id.isEmpty) {
-      print(" No money ID provided!");
-      return;
-    }
-
-    final url = 'http://167.71.232.245:8970/api/user/money/${widget.id}/pdf';
-    print(" Downloading PDF from: $url");
-
-    try {
-      final response = await http.get(Uri.parse(url));
-
-      if (response.statusCode == 200) {
-        final dir = await getTemporaryDirectory();
-        final file = File('${dir.path}/money_${widget.id}.pdf');
-        await file.writeAsBytes(response.bodyBytes);
-        setState(() {
-          localPath = file.path;
-        });
-        print(" PDF saved at: ${file.path}");
-      } else {
-        print(" Failed to download PDF. Status code: ${response.statusCode}");
-      }
-    } catch (e) {
-      print("Error downloading PDF: $e");
-    }
+    print("📩 Received quotation ID: ${widget.id}");
+    Future.microtask(() {
+      context.read<MoneyReceiptPdfProvider>().fetchmoneyPdf(widget.id);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: 'Money PDF'),
-      body: localPath == null
-          ? const Center(child: CircularProgressIndicator())
-          : PDFView(filePath: localPath!),
+      body: Consumer<MoneyReceiptPdfProvider>(
+        builder: (context, provider, _) {
+          if (provider.pdfLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (provider.errorMessage != null) {
+            return Center(child: Text(provider.errorMessage!));
+          } else if (provider.pdfLocalPath != null) {
+            return PDFView(filePath: provider.pdfLocalPath!);
+          } else {
+            return const Center(child: Text("No PDF available"));
+          }
+        },
+      ),
+    );
+  }
+}
+*/
+
+
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:flutter_pdfview/flutter_pdfview.dart';
+import 'package:provider/provider.dart';
+import 'package:screen_protector/screen_protector.dart';
+
+import '../../../../core/widgets/custom_app_bar/ui/customAppBar.dart';
+import '../../quotation_pdf/subscription_pdf/subscription_pdf_provider.dart';
+import '../provider/money_receipt_pdf_provider.dart';
+
+
+class MoneyPdfWebViewScreen extends StatefulWidget {
+  final String id;
+  const MoneyPdfWebViewScreen({Key? key, required this.id}) : super(key: key);
+
+  @override
+  _MoneyPdfWebViewScreenState createState() => _MoneyPdfWebViewScreenState();
+}
+
+class _MoneyPdfWebViewScreenState extends State<MoneyPdfWebViewScreen> {
+  String loadingText = "Loading PDF";
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _startLoadingAnimation();
+
+    Future.microtask(() async {
+      try {
+        // ✅ Fetch subscription info first
+        final subscriptionProvider =
+        context.read<SubscriptionPdfProvider>();
+        await subscriptionProvider.fetchSubscriptionPdf();
+
+        final isSubscribed = subscriptionProvider.isSubscribed;
+        print('💰 Money Receipt Subscription status: $isSubscribed');
+
+        if (!isSubscribed) {
+          print('Blocking screenshots because user is not subscribed (Money Receipt)');
+          try {
+            await ScreenProtector.preventScreenshotOn();
+            print('✅ Screenshot protection enabled for Money Receipt PDF');
+          } catch (e) {
+            print("⚠️ Failed to block screenshots: $e");
+          }
+        } else {
+          print('Allowing screenshots because user is subscribed (Money Receipt)');
+          try {
+            await ScreenProtector.preventScreenshotOff();
+          } catch (e) {
+            print("⚠️ Failed to allow screenshots: $e");
+          }
+        }
+      } catch (e) {
+        print("⚠️ Money Receipt subscription check failed: $e");
+      } finally {
+        // ✅ Always fetch PDF regardless of subscription status
+        context.read<MoneyReceiptPdfProvider>().fetchmoneyPdf(widget.id);
+      }
+    });
+  }
+
+  void _startLoadingAnimation() {
+    int dotCount = 0;
+    _timer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+      setState(() {
+        dotCount = (dotCount + 1) % 4;
+        loadingText = "Loading PDF" + "." * dotCount;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+
+    // ✅ Reset screenshot protection when leaving
+    try {
+      ScreenProtector.preventScreenshotOff();
+    } catch (e) {
+      print("⚠️ Failed to clear screenshot protection: $e");
+    }
+
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: CustomAppBar(title: 'Money PDF'),
+      body: Consumer<MoneyReceiptPdfProvider>(
+        builder: (context, provider, _) {
+          if (provider.pdfLoading) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 20),
+                  Text(
+                    loadingText,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          } else if (provider.errorMessage != null) {
+            return Center(child: Text(provider.errorMessage!));
+          } else if (provider.pdfLocalPath != null) {
+            return PDFView(filePath: provider.pdfLocalPath!);
+          } else {
+            return const Center(child: Text("No PDF available"));
+          }
+        },
+      ),
     );
   }
 }
